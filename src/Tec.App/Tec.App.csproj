@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <RootNamespace>Tec.App</RootNamespace>
+    <AssemblyName>tec</AssemblyName>
+    <UseWPF>true</UseWPF>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Tec.Core\Tec.Core.csproj" />
+    <ProjectReference Include="..\Tec.Windows\Tec.Windows.csproj" />
+  </ItemGroup>
+
+</Project>

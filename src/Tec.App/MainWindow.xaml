@@ -1,0 +1,86 @@
+<Window x:Class="Tec.App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="TEC — Test Evidence Collector"
+        Width="760" Height="600" MinWidth="560" MinHeight="420"
+        WindowStartupLocation="CenterScreen">
+    <DockPanel Margin="12">
+        <!-- Aplicación a probar -->
+        <GroupBox DockPanel.Dock="Top" Header="Aplicación a probar" Padding="6">
+            <DockPanel IsEnabled="{Binding IsIdle}">
+                <Button DockPanel.Dock="Right" Content="Iniciar app…" Command="{Binding LaunchCommand}" />
+                <Button DockPanel.Dock="Right" Content="Actualizar" Command="{Binding RefreshProcessesCommand}" />
+                <ComboBox ItemsSource="{Binding Processes}" SelectedItem="{Binding SelectedProcess}" />
+            </DockPanel>
+        </GroupBox>
+
+        <!-- Opciones -->
+        <GroupBox DockPanel.Dock="Top" Header="Opciones" Padding="6" Margin="0,8,0,0">
+            <Grid IsEnabled="{Binding IsIdle}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Text="Capturar:" VerticalAlignment="Center" Margin="0,0,8,0" />
+                <WrapPanel Grid.Row="0" Grid.Column="1">
+                    <CheckBox Content="Clicks" IsChecked="{Binding CaptureClicks}" />
+                    <CheckBox Content="Comandos de teclado" IsChecked="{Binding CaptureKeyboardCommands}" />
+                    <CheckBox Content="Texto ingresado" IsChecked="{Binding CaptureTextInput}" />
+                    <CheckBox Content="Ventanas nuevas" IsChecked="{Binding CaptureWindows}" />
+                    <CheckBox Content="Cambios en pantalla" IsChecked="{Binding CaptureContentChanges}"
+                              ToolTip="Overlays de carga, paneles o resultados que aparecen dentro de la misma ventana" />
+                </WrapPanel>
+
+                <TextBlock Grid.Row="1" Text="Área:" VerticalAlignment="Center" Margin="0,6,8,0" />
+                <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Margin="0,6,0,0">
+                    <ComboBox Width="200" ItemsSource="{Binding CaptureAreas}" SelectedItem="{Binding SelectedArea}" DisplayMemberPath="Label" />
+                    <TextBlock Text="Espera de ventanas (ms):" VerticalAlignment="Center" Margin="16,0,6,0" />
+                    <TextBox Width="60" Text="{Binding WindowSettleDelayMs, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center" />
+                </StackPanel>
+
+                <TextBlock Grid.Row="2" Text="Carpeta:" VerticalAlignment="Center" Margin="0,6,8,0" />
+                <DockPanel Grid.Row="2" Grid.Column="1" Margin="0,6,0,0">
+                    <Button DockPanel.Dock="Right" Content="Examinar…" Command="{Binding BrowseOutputCommand}" />
+                    <TextBox Text="{Binding OutputRoot}" VerticalContentAlignment="Center" />
+                </DockPanel>
+
+                <CheckBox Grid.Row="3" Grid.Column="1" Margin="0,6,0,0" Content="Minimizar TEC al iniciar la grabación" IsChecked="{Binding MinimizeOnStart}" />
+            </Grid>
+        </GroupBox>
+
+        <!-- Acciones -->
+        <DockPanel DockPanel.Dock="Top" Margin="0,10,0,6">
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                <Button Content="Abrir reporte" Command="{Binding OpenReportCommand}" />
+                <Button Content="Abrir carpeta" Command="{Binding OpenFolderCommand}" />
+                <Button Content="Ver logs" Command="{Binding OpenLogsCommand}" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Button Content="● Iniciar" Margin="0" FontWeight="SemiBold" Command="{Binding StartCommand}" />
+                <Button Content="■ Detener" Command="{Binding StopCommand}" />
+            </StackPanel>
+        </DockPanel>
+
+        <TextBlock DockPanel.Dock="Bottom" Text="{Binding Status}" TextWrapping="Wrap" Margin="0,6,0,0" Foreground="#444" />
+
+        <!-- Evidencias -->
+        <ListBox ItemsSource="{Binding Evidences}" SelectedItem="{Binding SelectedEvidence}"
+                 MouseDoubleClick="OnEvidenceDoubleClick" HorizontalContentAlignment="Stretch">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Margin="2,3">
+                        <TextBlock Text="{Binding Title}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                        <TextBlock Text="{Binding Details}" Foreground="#666" FontSize="11" TextTrimming="CharacterEllipsis" />
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </DockPanel>
+</Window>
