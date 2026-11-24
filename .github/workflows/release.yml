@@ -1,0 +1,59 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Obtener versión del tag
+        id: version
+        shell: bash
+        run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Pruebas
+        run: dotnet test Tec.slnx --configuration Release
+
+      - name: Publicar ejecutable
+        run: >
+          dotnet publish src/Tec.App/Tec.App.csproj
+          --configuration Release
+          --runtime win-x64
+          --self-contained true
+          --output publish
+          -p:Version=${{ steps.version.outputs.version }}
+          -p:PublishSingleFile=true
+          -p:IncludeNativeLibrariesForSelfExtract=true
+          -p:EnableCompressionInSingleFile=true
+          -p:DebugType=none
+          -p:PublishDocumentationFile=false
+          -p:PublishReferencesDocumentationFiles=false
+
+      - name: Empaquetar
+        shell: pwsh
+        run: |
+          Copy-Item README.md publish/
+          Compress-Archive -Path publish/* -DestinationPath "tec-${{ steps.version.outputs.version }}-win-x64.zip"
+
+      - name: Crear release en GitHub
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >
+          gh release create "$GITHUB_REF_NAME"
+          "tec-${{ steps.version.outputs.version }}-win-x64.zip"
+          --title "TEC $GITHUB_REF_NAME"
+          --generate-notes
+          $([[ "$GITHUB_REF_NAME" == *-* ]] && echo --prerelease)
