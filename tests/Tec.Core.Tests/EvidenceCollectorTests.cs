@@ -30,6 +30,24 @@ public class EvidenceCollectorTests
     }
 
     [Fact]
+    public async Task Carries_the_application_name_and_works_without_it()
+    {
+        var source = new FakeSource();
+        var sink = new RecordingSink();
+        var collector = CreateCollector(source, sink, new ProcessInteractionFilter([42, 7]));
+
+        await collector.StartAsync(Session);
+        source.Emit(Click(processId: 42) with { ProcessName = "Postman" });
+        source.Emit(Click(processId: 7));
+        await collector.StopAsync();
+
+        var names = sink.Evidences.Select(e => e.Interaction.ProcessName).ToList();
+        Assert.Equal(2, names.Count);
+        Assert.Contains("Postman", names);
+        Assert.Contains(null, names);
+    }
+
+    [Fact]
     public async Task Highlights_the_element_and_uses_snapshot_enrichment()
     {
         var source = new FakeSource();

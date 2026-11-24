@@ -40,6 +40,24 @@ public class CaptionFormatterTests
     }
 
     [Fact]
+    public void Click_details_name_the_application_when_it_is_known()
+    {
+        var interaction = Click() with { ProcessName = "Postman" };
+
+        Assert.Contains("Aplicación: Postman", Spanish.Format(3, interaction).Details);
+        Assert.Contains("App: Postman", English.Format(3, interaction).Details);
+    }
+
+    [Fact]
+    public void Click_details_omit_the_application_when_it_is_unknown()
+    {
+        var details = English.Format(3, Click()).Details;
+
+        Assert.DoesNotContain("App:", details);
+        Assert.Contains("Window: \"Principal\"", details);
+    }
+
+    [Fact]
     public void Control_type_without_id_uses_the_name_given_by_the_system()
     {
         var interaction = Click() with { Element = new UiElementInfo("Procesar", "botón", null, null) };
