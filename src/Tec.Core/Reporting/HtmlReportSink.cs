@@ -100,7 +100,10 @@ public sealed class HtmlReportSink(
             </head>
             <body>
             """);
-        sb.Append("<header><h1>").Append(E(texts.Get("Title"))).Append(" — ").Append(E(session.TargetDescription)).Append("</h1>");
+        sb.Append("<header><h1>").Append(E(texts.Get("Title"))).Append(" — ").Append(E(session.Name)).Append("</h1>");
+        // The applications are in the header either way: without a name of its own the title already lists them.
+        if (session.Name != session.TargetDescription)
+            sb.Append("<p>").Append(E(texts.Get("Applications"))).Append(": ").Append(E(session.TargetDescription)).Append("</p>");
         sb.Append("<p>").Append(E(texts.Get("Started"))).Append(": ").Append(D(session.StartedAt));
         sb.Append(" · ").Append(E(finishedAt is { } f ? $"{texts.Get("Finished")}: {D(f)}" : texts.Get("InProgress")));
         sb.Append(" · ").Append(E(texts.Get("EvidenceCount"))).Append(": ").Append(entries.Count).Append("</p>");
