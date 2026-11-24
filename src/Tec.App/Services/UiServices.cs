@@ -7,8 +7,8 @@ namespace Tec.App.Services;
 /// <summary>User and shell interaction, kept out of the ViewModel so it can be replaced.</summary>
 public interface IUserDialogs
 {
-    string? PickFolder(string initialDirectory);
-    string? PickExecutable();
+    string? PickFolder(string initialDirectory, string title);
+    string? PickExecutable(string title, string filter);
     void ShowError(string message);
     void OpenInShell(string path);
     void MinimizeMainWindow();
@@ -17,15 +17,15 @@ public interface IUserDialogs
 
 public sealed class WpfUserDialogs : IUserDialogs
 {
-    public string? PickFolder(string initialDirectory)
+    public string? PickFolder(string initialDirectory, string title)
     {
-        var dialog = new OpenFolderDialog { InitialDirectory = initialDirectory, Title = "Carpeta de evidencias" };
+        var dialog = new OpenFolderDialog { InitialDirectory = initialDirectory, Title = title };
         return dialog.ShowDialog() == true ? dialog.FolderName : null;
     }
 
-    public string? PickExecutable()
+    public string? PickExecutable(string title, string filter)
     {
-        var dialog = new OpenFileDialog { Filter = "Aplicaciones (*.exe)|*.exe", Title = "Aplicación a probar" };
+        var dialog = new OpenFileDialog { Filter = filter, Title = title };
         return dialog.ShowDialog() == true ? dialog.FileName : null;
     }
 

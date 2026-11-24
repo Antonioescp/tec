@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Net;
 using System.Text;
 using Tec.Core.Abstractions;
+using Tec.Core.Localization;
 using Tec.Core.Model;
 
 namespace Tec.Core.Reporting;
@@ -12,7 +13,7 @@ namespace Tec.Core.Reporting;
 /// piece of evidence so the report exists even if the session does not close cleanly.
 /// </summary>
 [SuppressMessage("Reliability", "CA1001", Justification = "SemaphoreSlim does not use AvailableWaitHandle, so it holds no native resources.")]
-public sealed class HtmlReportSink(IEvidenceFileNamer namer, IClock clock) : IEvidenceSink
+public sealed class HtmlReportSink(IEvidenceFileNamer namer, IClock clock, TecLanguage language) : IEvidenceSink
 {
     public const string FileName = "reporte.html";
 
@@ -20,6 +21,7 @@ public sealed class HtmlReportSink(IEvidenceFileNamer namer, IClock clock) : IEv
 
     private readonly List<Entry> _entries = [];
     private readonly SemaphoreSlim _gate = new(1, 1);
+    private readonly Texts _texts = new(CoreResources.Report, language.Culture);
 
     public Task OnSessionStartedAsync(EvidenceSession session, CancellationToken cancellationToken)
     {
@@ -49,7 +51,7 @@ public sealed class HtmlReportSink(IEvidenceFileNamer namer, IClock clock) : IEv
         await _gate.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
         {
-            var html = Render(session, finishedAt, [.. _entries.OrderBy(e => e.Sequence)]);
+            var html = Render(session, finishedAt, [.. _entries.OrderBy(e => e.Sequence)], language, _texts);
             await File.WriteAllTextAsync(Path.Combine(session.OutputDirectory, FileName), html, Encoding.UTF8, cancellationToken).ConfigureAwait(false);
         }
         finally
@@ -58,19 +60,19 @@ public sealed class HtmlReportSink(IEvidenceFileNamer namer, IClock clock) : IEv
         }
     }
 
-    private static string Render(EvidenceSession session, DateTimeOffset? finishedAt, IReadOnlyList<Entry> entries)
+    private static string Render(EvidenceSession session, DateTimeOffset? finishedAt, IReadOnlyList<Entry> entries, TecLanguage language, Texts texts)
     {
         static string E(string? text) => WebUtility.HtmlEncode(text ?? string.Empty);
         static string D(DateTimeOffset d) => d.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
 
         var sb = new StringBuilder();
+        sb.AppendLine("<!doctype html>");
+        sb.Append("<html lang=\"").Append(language.Code).AppendLine("\">");
+        sb.AppendLine("<head>");
+        sb.Append("<title>").Append(E(texts.Get("Title"))).AppendLine("</title>");
         sb.Append("""
-            <!doctype html>
-            <html lang="es">
-            <head>
             <meta charset="utf-8">
             <meta name="viewport" content="width=device-width, initial-scale=1">
-            <title>Evidencia de prueba</title>
             <style>
               body { font-family: "Segoe UI", sans-serif; margin: 0; background: #f4f4f5; color: #1f1f23; }
               header { background: #1e1e1e; color: #fff; padding: 16px 24px; }
@@ -86,11 +88,11 @@ public sealed class HtmlReportSink(IEvidenceFileNamer namer, IClock clock) : IEv
             </head>
             <body>
             """);
-        sb.Append("<header><h1>Evidencia de prueba — ").Append(E(session.TargetDescription)).Append("</h1>");
-        sb.Append("<p>Inicio: ").Append(D(session.StartedAt));
-        sb.Append(finishedAt is { } f ? $" · Fin: {D(f)}" : " · En curso");
-        sb.Append(" · Evidencias: ").Append(entries.Count).Append("</p>");
-        sb.Append("<p>Sesión: ").Append(E(session.Id)).Append("</p></header><main>");
+        sb.Append("<header><h1>").Append(E(texts.Get("Title"))).Append(" — ").Append(E(session.TargetDescription)).Append("</h1>");
+        sb.Append("<p>").Append(E(texts.Get("Started"))).Append(": ").Append(D(session.StartedAt));
+        sb.Append(" · ").Append(E(finishedAt is { } f ? $"{texts.Get("Finished")}: {D(f)}" : texts.Get("InProgress")));
+        sb.Append(" · ").Append(E(texts.Get("EvidenceCount"))).Append(": ").Append(entries.Count).Append("</p>");
+        sb.Append("<p>").Append(E(texts.Get("Session"))).Append(": ").Append(E(session.Id)).Append("</p></header><main>");
 
         if (entries.Count > 0)
         {

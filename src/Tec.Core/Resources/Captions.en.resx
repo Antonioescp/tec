@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Kind_click" xml:space="preserve">
+    <value>Left click</value>
+  </data>
+  <data name="Kind_click-derecho" xml:space="preserve">
+    <value>Right click</value>
+  </data>
+  <data name="Kind_click-central" xml:space="preserve">
+    <value>Middle click</value>
+  </data>
+  <data name="Kind_doble-click" xml:space="preserve">
+    <value>Double click</value>
+  </data>
+  <data name="Kind_comando" xml:space="preserve">
+    <value>Keyboard command</value>
+  </data>
+  <data name="Kind_texto" xml:space="preserve">
+    <value>Text input</value>
+  </data>
+  <data name="Kind_ventana" xml:space="preserve">
+    <value>Window shown</value>
+  </data>
+  <data name="Kind_cambio" xml:space="preserve">
+    <value>Screen change</value>
+  </data>
+  <data name="ControlType_AppBar" xml:space="preserve">
+    <value>app bar</value>
+  </data>
+  <data name="ControlType_Button" xml:space="preserve">
+    <value>button</value>
+  </data>
+  <data name="ControlType_Calendar" xml:space="preserve">
+    <value>calendar</value>
+  </data>
+  <data name="ControlType_CheckBox" xml:space="preserve">
+    <value>check box</value>
+  </data>
+  <data name="ControlType_ComboBox" xml:space="preserve">
+    <value>combo box</value>
+  </data>
+  <data name="ControlType_Custom" xml:space="preserve">
+    <value>custom</value>
+  </data>
+  <data name="ControlType_DataGrid" xml:space="preserve">
+    <value>data grid</value>
+  </data>
+  <data name="ControlType_DataItem" xml:space="preserve">
+    <value>data item</value>
+  </data>
+  <data name="ControlType_Document" xml:space="preserve">
+    <value>document</value>
+  </data>
+  <data name="ControlType_Edit" xml:space="preserve">
+    <value>edit</value>
+  </data>
+  <data name="ControlType_Group" xml:space="preserve">
+    <value>group</value>
+  </data>
+  <data name="ControlType_Header" xml:space="preserve">
+    <value>header</value>
+  </data>
+  <data name="ControlType_HeaderItem" xml:space="preserve">
+    <value>header item</value>
+  </data>
+  <data name="ControlType_Hyperlink" xml:space="preserve">
+    <value>link</value>
+  </data>
+  <data name="ControlType_Image" xml:space="preserve">
+    <value>image</value>
+  </data>
+  <data name="ControlType_List" xml:space="preserve">
+    <value>list</value>
+  </data>
+  <data name="ControlType_ListItem" xml:space="preserve">
+    <value>list item</value>
+  </data>
+  <data name="ControlType_Menu" xml:space="preserve">
+    <value>menu</value>
+  </data>
+  <data name="ControlType_MenuBar" xml:space="preserve">
+    <value>menu bar</value>
+  </data>
+  <data name="ControlType_MenuItem" xml:space="preserve">
+    <value>menu item</value>
+  </data>
+  <data name="ControlType_Pane" xml:space="preserve">
+    <value>pane</value>
+  </data>
+  <data name="ControlType_ProgressBar" xml:space="preserve">
+    <value>progress bar</value>
+  </data>
+  <data name="ControlType_RadioButton" xml:space="preserve">
+    <value>radio button</value>
+  </data>
+  <data name="ControlType_ScrollBar" xml:space="preserve">
+    <value>scroll bar</value>
+  </data>
+  <data name="ControlType_SemanticZoom" xml:space="preserve">
+    <value>semantic zoom</value>
+  </data>
+  <data name="ControlType_Separator" xml:space="preserve">
+    <value>separator</value>
+  </data>
+  <data name="ControlType_Slider" xml:space="preserve">
+    <value>slider</value>
+  </data>
+  <data name="ControlType_Spinner" xml:space="preserve">
+    <value>spinner</value>
+  </data>
+  <data name="ControlType_SplitButton" xml:space="preserve">
+    <value>split button</value>
+  </data>
+  <data name="ControlType_StatusBar" xml:space="preserve">
+    <value>status bar</value>
+  </data>
+  <data name="ControlType_Tab" xml:space="preserve">
+    <value>tab</value>
+  </data>
+  <data name="ControlType_TabItem" xml:space="preserve">
+    <value>tab item</value>
+  </data>
+  <data name="ControlType_Table" xml:space="preserve">
+    <value>table</value>
+  </data>
+  <data name="ControlType_Text" xml:space="preserve">
+    <value>text</value>
+  </data>
+  <data name="ControlType_Thumb" xml:space="preserve">
+    <value>thumb</value>
+  </data>
+  <data name="ControlType_TitleBar" xml:space="preserve">
+    <value>title bar</value>
+  </data>
+  <data name="ControlType_ToolBar" xml:space="preserve">
+    <value>toolbar</value>
+  </data>
+  <data name="ControlType_ToolTip" xml:space="preserve">
+    <value>tooltip</value>
+  </data>
+  <data name="ControlType_Tree" xml:space="preserve">
+    <value>tree</value>
+  </data>
+  <data name="ControlType_TreeItem" xml:space="preserve">
+    <value>tree item</value>
+  </data>
+  <data name="ControlType_Window" xml:space="preserve">
+    <value>window</value>
+  </data>
+  <data name="Key_Backspace" xml:space="preserve">
+    <value>Backspace</value>
+  </data>
+  <data name="Key_Space" xml:space="preserve">
+    <value>Space</value>
+  </data>
+  <data name="Key_Delete" xml:space="preserve">
+    <value>Del</value>
+  </data>
+  <data name="Key_Home" xml:space="preserve">
+    <value>Home</value>
+  </data>
+  <data name="Key_End" xml:space="preserve">
+    <value>End</value>
+  </data>
+  <data name="Key_PageUp" xml:space="preserve">
+    <value>PgUp</value>
+  </data>
+  <data name="Key_PageDown" xml:space="preserve">
+    <value>PgDn</value>
+  </data>
+  <data name="Key_Left" xml:space="preserve">
+    <value>←</value>
+  </data>
+  <data name="Key_Up" xml:space="preserve">
+    <value>↑</value>
+  </data>
+  <data name="Key_Right" xml:space="preserve">
+    <value>→</value>
+  </data>
+  <data name="Key_Down" xml:space="preserve">
+    <value>↓</value>
+  </data>
+  <data name="Key_Menu" xml:space="preserve">
+    <value>Menu</value>
+  </data>
+  <data name="Key_Pause" xml:space="preserve">
+    <value>Pause</value>
+  </data>
+  <data name="Key_PrintScreen" xml:space="preserve">
+    <value>PrtSc</value>
+  </data>
+  <data name="Note_window-closed" xml:space="preserve">
+    <value>The window closed before the capture</value>
+  </data>
+  <data name="Note_screen-still-changing" xml:space="preserve">
+    <value>The screen was still changing (animation in progress)</value>
+  </data>
+  <data name="Note_element-timeout" xml:space="preserve">
+    <value>The application did not respond in time to identify the element</value>
+  </data>
+  <data name="Note_enrichment-failed" xml:space="preserve">
+    <value>Could not get additional information ({0})</value>
+  </data>
+  <data name="UnknownElement" xml:space="preserve">
+    <value>element</value>
+  </data>
+  <data name="Window" xml:space="preserve">
+    <value>Window: "{0}"</value>
+  </data>
+  <data name="Position" xml:space="preserve">
+    <value>Position: ({0}, {1})</value>
+  </data>
+  <data name="CommandOnElement" xml:space="preserve">
+    <value>{0} on {1}</value>
+  </data>
+  <data name="ContentChanged" xml:space="preserve">
+    <value>{0:P0} of the window changed</value>
+  </data>
+</root>

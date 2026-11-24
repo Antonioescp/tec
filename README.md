@@ -14,7 +14,9 @@ se presiona **Iniciar** y TEC toma una captura por cada interacción:
 Cada imagen lleva una cabecera con el número, el tipo de interacción, el elemento, la
 hora, la ventana y la posición, y un **recuadro rojo**; si el fondo alrededor del recuadro
 es rojo (o parecido) se usa otro color que contraste (azul, magenta, verde…).
-La cabecera puede generarse en español o en inglés (opción **Idioma de las leyendas**).
+TEC está disponible en español y en inglés (opción **Idioma**): el idioma elegido se usa en la
+interfaz, en las cabeceras de las capturas y en el reporte, y se recuerda entre ejecuciones
+(`%LOCALAPPDATA%\TEC\settings.json`). La primera vez se usa el idioma de Windows.
 
 Por cada sesión se crea una carpeta `Documentos\TEC\Evidencias\<fecha>_<app>\` con:
 
@@ -56,8 +58,9 @@ Tec.Core      (net10.0, sin dependencias de plataforma)
                 ICaptureRegionProvider, IScreenCapturer, IHighlightColorSelector,
                 IInteractionCaptionFormatter, IFrameAnnotator, IImageEncoder, IEvidenceSink
   Services      EvidenceCollector (orquestador), InteractionSnapshotter, EvidenceComposer,
-                ContrastingHighlightColorSelector, VisualChangeDetector, filtros
-  Services/Captions  CaptionFormatter, CaptionLanguage (español, inglés)
+                ContrastingHighlightColorSelector, CaptionFormatter, VisualChangeDetector, filtros
+  Localization  TecLanguage (idiomas disponibles), Texts (lectura de .resx)
+  Resources     Captions*.resx, Report*.resx
   Reporting     ImageFileEvidenceSink, HtmlReportSink, JsonLinesEvidenceLogSink
 
 Tec.Windows   (net10.0-windows: Win32, UI Automation, GDI+)
@@ -67,6 +70,8 @@ Tec.Windows   (net10.0-windows: Win32, UI Automation, GDI+)
   Imaging       GdiScreenCapturer, PrintWindowContentCapturer, GdiFrameAnnotator, PngImageEncoder
 
 Tec.App       (WPF, MVVM) interfaz + composition root (EvidenceSessionFactory)
+  Localization  Localizer (textos de la interfaz, cambian sin reiniciar)
+  Resources     Strings*.resx
 ```
 
 Flujo de una interacción:
@@ -101,7 +106,7 @@ composición/escritura en un único consumidor, así que los hooks nunca se bloq
 | Otra tecnología (WinForms, web, Java) | `IInteractionSource` y/o `IInteractionEnricher` |
 | Ajustar la sensibilidad de los cambios en pantalla | `VisualChangeOptions` (umbral, tiempo de estabilización, animaciones) |
 | Exportar a Word/PDF o subir a Jira/Azure DevOps | `IEvidenceSink` |
-| Otro idioma de leyenda | Un `CaptionLanguage` nuevo (ver `CaptionLanguage.English.cs`) agregado a `CaptionLanguage.All` |
+| Otro idioma | Copias `*.<código>.resx` de `Captions.resx`, `Report.resx` y `Strings.resx` traducidas, y el idioma registrado en `TecLanguage.All` |
 | Otro formato de leyenda | `IInteractionCaptionFormatter` |
 | Otro estilo de anotación | `IFrameAnnotator` o `AnnotationStyle` |
 | Otra regla de qué capturar | `IInteractionFilter` |

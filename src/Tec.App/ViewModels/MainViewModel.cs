@@ -1,19 +1,24 @@
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Input;
 using Tec.App.Composition;
+using Tec.App.Localization;
 using Tec.App.Mvvm;
 using Tec.App.Services;
 using Tec.Core.Diagnostics;
+using Tec.Core.Localization;
 using Tec.Core.Model;
-using Tec.Core.Services.Captions;
 using Tec.Windows.Processes;
 
 namespace Tec.App.ViewModels;
 
 public sealed record EvidenceItem(int Sequence, string Title, string Details, string ImagePath);
 
-public sealed record CaptureAreaOption(CaptureArea Value, string Label);
+public sealed record CaptureAreaOption(CaptureArea Value, string Label)
+{
+    public override string ToString() => Label;
+}
 
 public sealed class MainViewModel : ObservableObject
 {
@@ -22,13 +27,15 @@ public sealed class MainViewModel : ObservableObject
     private readonly ITargetProcessCatalog _catalog;
     private readonly IUserDialogs _dialogs;
     private readonly string _logDirectory;
+    private readonly IUserSettingsStore _settingsStore;
+    private readonly Localizer _localizer = Localizer.Instance;
 
     private RunningSession? _session;
     private TargetProcessInfo? _selectedProcess;
-    private CaptureAreaOption _selectedArea;
-    private CaptionLanguage _captionLanguage = CaptionLanguage.Spanish;
+    private IReadOnlyList<CaptureAreaOption> _captureAreas = [];
+    private CaptureAreaOption _selectedArea = null!;
     private string _outputRoot;
-    private string _status = "Selecciona la aplicación a probar y presiona Iniciar.";
+    private Func<string> _status;
     private bool _captureClicks = true;
     private bool _captureKeyboardCommands = true;
     private bool _captureTextInput = true;
@@ -38,20 +45,17 @@ public sealed class MainViewModel : ObservableObject
     private int _windowSettleDelayMs = 250;
     private EvidenceItem? _selectedEvidence;
 
-    public MainViewModel(ITargetProcessCatalog catalog, IUserDialogs dialogs, string logDirectory)
+    public MainViewModel(ITargetProcessCatalog catalog, IUserDialogs dialogs, IUserSettingsStore settingsStore, string logDirectory)
     {
         _catalog = catalog;
         _dialogs = dialogs;
+        _settingsStore = settingsStore;
         _logDirectory = logDirectory;
         _outputRoot = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "TEC", "Evidencias");
+        _status = () => _localizer["StatusReady"];
 
-        CaptureAreas =
-        [
-            new(CaptureArea.Window, "Ventana de la aplicación"),
-            new(CaptureArea.Monitor, "Monitor completo"),
-            new(CaptureArea.AllScreens, "Todas las pantallas"),
-        ];
-        _selectedArea = CaptureAreas[0];
+        _localizer.Language = TecLanguage.Find(settingsStore.Load().Language) ?? TecLanguage.FromCulture(CultureInfo.CurrentUICulture);
+        BuildCaptureAreas(CaptureArea.Window);
 
         RefreshProcessesCommand = new RelayCommand(RefreshProcesses, () => !IsRunning);
         LaunchCommand = new RelayCommand(Launch, () => !IsRunning);
@@ -68,8 +72,8 @@ public sealed class MainViewModel : ObservableObject
 
     public ObservableCollection<TargetProcessInfo> Processes { get; } = [];
     public ObservableCollection<EvidenceItem> Evidences { get; } = [];
-    public IReadOnlyList<CaptureAreaOption> CaptureAreas { get; }
-    public IReadOnlyList<CaptionLanguage> CaptionLanguages { get; } = CaptionLanguage.All;
+    public IReadOnlyList<CaptureAreaOption> CaptureAreas { get => _captureAreas; private set => SetProperty(ref _captureAreas, value); }
+    public IReadOnlyList<TecLanguage> Languages { get; } = TecLanguage.All;
 
     public ICommand RefreshProcessesCommand { get; }
     public ICommand LaunchCommand { get; }
@@ -83,9 +87,25 @@ public sealed class MainViewModel : ObservableObject
 
     public TargetProcessInfo? SelectedProcess { get => _selectedProcess; set => SetProperty(ref _selectedProcess, value); }
     public CaptureAreaOption SelectedArea { get => _selectedArea; set => SetProperty(ref _selectedArea, value); }
-    public CaptionLanguage CaptionLanguage { get => _captionLanguage; set => SetProperty(ref _captionLanguage, value); }
+
+    /// <summary>Language of the interface, captions and report. It is remembered between runs.</summary>
+    public TecLanguage Language
+    {
+        get => _localizer.Language;
+        set
+        {
+            if (value is null || value == _localizer.Language) return;
+            _localizer.Language = value;
+            BuildCaptureAreas(SelectedArea.Value);
+            OnPropertyChanged(nameof(Language));
+            OnPropertyChanged(nameof(Status));
+            _settingsStore.Save(_settingsStore.Load() with { Language = value.Code });
+            Log.Info(LogCategory, $"Idioma cambiado a {value.Code}.");
+        }
+    }
     public string OutputRoot { get => _outputRoot; set => SetProperty(ref _outputRoot, value); }
-    public string Status { get => _status; private set => SetProperty(ref _status, value); }
+    /// <summary>Status line; it is kept as a function so it is rewritten when the language changes.</summary>
+    public string Status => _status();
     public bool CaptureClicks { get => _captureClicks; set => SetProperty(ref _captureClicks, value); }
     public bool CaptureKeyboardCommands { get => _captureKeyboardCommands; set => SetProperty(ref _captureKeyboardCommands, value); }
     public bool CaptureTextInput { get => _captureTextInput; set => SetProperty(ref _captureTextInput, value); }
@@ -109,7 +129,7 @@ public sealed class MainViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            ShowError("No se pudo obtener la lista de aplicaciones.", ex);
+            ShowError(_localizer["ErrorProcessList"], ex);
         }
         Log.Debug(LogCategory, $"Lista de aplicaciones actualizada: {Processes.Count} procesos.");
         SelectedProcess = Processes.FirstOrDefault(p => p.ProcessId == selectedId);
@@ -117,7 +137,7 @@ public sealed class MainViewModel : ObservableObject
 
     private void Launch()
     {
-        var path = _dialogs.PickExecutable();
+        var path = _dialogs.PickExecutable(_localizer["PickExecutableTitle"], _localizer["ExecutableFilter"]);
         if (path is null) return;
         Log.Info(LogCategory, $"Iniciando aplicación: {path}");
         try
@@ -131,17 +151,17 @@ public sealed class MainViewModel : ObservableObject
                 Processes.Add(launched);
                 SelectedProcess = launched;
             }
-            Status = $"Aplicación iniciada: {launched}";
+            SetStatus(() => _localizer.Format("StatusAppLaunched", launched));
         }
         catch (Exception ex)
         {
-            ShowError($"No se pudo iniciar la aplicación {path}.", ex);
+            ShowError(_localizer.Format("ErrorLaunch", path), ex);
         }
     }
 
     private void BrowseOutput()
     {
-        var folder = _dialogs.PickFolder(OutputRoot);
+        var folder = _dialogs.PickFolder(OutputRoot, _localizer["PickFolderTitle"]);
         if (folder is not null) OutputRoot = folder;
     }
 
@@ -155,7 +175,7 @@ public sealed class MainViewModel : ObservableObject
                 Target = target,
                 OutputRoot = OutputRoot,
                 Area = SelectedArea.Value,
-                CaptionLanguage = CaptionLanguage,
+                Language = Language,
                 CaptureClicks = CaptureClicks,
                 CaptureKeyboardCommands = CaptureKeyboardCommands,
                 CaptureTextInput = CaptureTextInput,
@@ -167,7 +187,7 @@ public sealed class MainViewModel : ObservableObject
 
             var session = await Task.Run(() => EvidenceSessionFactory.Create(settings));
             session.Collector.EvidenceCollected += (_, evidence) => OnEvidenceCollected(session, evidence);
-            session.Collector.ErrorOccurred += (_, ex) => OnUi(() => Status = $"Error: {ex.Message} (detalle en el log)");
+            session.Collector.ErrorOccurred += (_, ex) => OnUi(() => SetStatus(() => _localizer.Format("StatusError", ex.Message)));
             try
             {
                 await session.Collector.StartAsync(session.Session);
@@ -182,7 +202,7 @@ public sealed class MainViewModel : ObservableObject
             _session = session;
             Evidences.Clear();
             CurrentSessionDirectory = session.Session.OutputDirectory;
-            Status = $"Grabando evidencia de {target.ProcessName}. Las interacciones con TEC no se capturan.";
+            SetStatus(() => _localizer.Format("StatusRecording", target.ProcessName));
             NotifyRunningChanged();
             Log.Info(LogCategory, $"Sesión iniciada en {session.Session.OutputDirectory}");
 
@@ -190,25 +210,27 @@ public sealed class MainViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            ShowError("No se pudo iniciar la sesión.", ex);
+            ShowError(_localizer["ErrorStart"], ex);
         }
     }
 
     private async Task StopAsync()
     {
         if (_session is not { } session) return;
-        Status = "Deteniendo y generando el reporte...";
+        SetStatus(() => _localizer["StatusStopping"]);
         Log.Info(LogCategory, "Deteniendo la sesión.");
         try
         {
             await session.DisposeAsync();
-            Status = $"Sesión terminada: {Evidences.Count} evidencias en {CurrentSessionDirectory}";
+            var count = Evidences.Count;
+            var directory = CurrentSessionDirectory;
+            SetStatus(() => _localizer.Format("StatusFinished", count, directory));
             Log.Info(LogCategory, $"Sesión terminada: {Evidences.Count} evidencias.");
         }
         catch (Exception ex)
         {
-            Status = "La sesión terminó con errores (detalle en el log).";
-            ShowError("Ocurrió un error al detener la sesión o al generar el reporte.", ex);
+            SetStatus(() => _localizer["StatusFinishedWithErrors"]);
+            ShowError(_localizer["ErrorStop"], ex);
         }
         _session = null;
         NotifyRunningChanged();
@@ -227,7 +249,8 @@ public sealed class MainViewModel : ObservableObject
             var index = 0;
             while (index < Evidences.Count && Evidences[index].Sequence < item.Sequence) index++;
             Evidences.Insert(index, item);
-            Status = $"Grabando… {Evidences.Count} evidencias";
+            var count = Evidences.Count;
+            SetStatus(() => _localizer.Format("StatusRecordingCount", count));
         });
     }
 
@@ -244,14 +267,31 @@ public sealed class MainViewModel : ObservableObject
     private void OpenPath(string path)
     {
         try { _dialogs.OpenInShell(path); }
-        catch (Exception ex) { ShowError($"No se pudo abrir {path}.", ex); }
+        catch (Exception ex) { ShowError(_localizer.Format("ErrorOpen", path), ex); }
     }
 
     /// <summary>Logs the full error (with stack trace) and shows the user a summary.</summary>
     private void ShowError(string message, Exception ex)
     {
         Log.Error(LogCategory, message, ex);
-        _dialogs.ShowError($"{message}\n\n{ex.Message}\n\nDetalle en el log: {_logDirectory}");
+        _dialogs.ShowError(_localizer.Format("ErrorDetails", message, ex.Message, _logDirectory));
+    }
+
+    private void SetStatus(Func<string> status)
+    {
+        _status = status;
+        OnPropertyChanged(nameof(Status));
+    }
+
+    private void BuildCaptureAreas(CaptureArea selected)
+    {
+        CaptureAreas =
+        [
+            new(CaptureArea.Window, _localizer["AreaWindow"]),
+            new(CaptureArea.Monitor, _localizer["AreaMonitor"]),
+            new(CaptureArea.AllScreens, _localizer["AreaAllScreens"]),
+        ];
+        SelectedArea = CaptureAreas.First(area => area.Value == selected);
     }
 
     private static async Task DisposeQuietlyAsync(RunningSession session)

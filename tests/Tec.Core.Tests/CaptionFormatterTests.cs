@@ -1,13 +1,14 @@
+using Tec.Core.Localization;
 using Tec.Core.Model;
-using Tec.Core.Services.Captions;
+using Tec.Core.Services;
 
 namespace Tec.Core.Tests;
 
 public class CaptionFormatterTests
 {
     private static readonly DateTimeOffset Now = new(2026, 11, 13, 10, 20, 30, TimeSpan.Zero);
-    private static readonly CaptionFormatter Spanish = new(CaptionLanguage.Spanish);
-    private static readonly CaptionFormatter English = new(CaptionLanguage.English);
+    private static readonly CaptionFormatter Spanish = new(TecLanguage.Spanish);
+    private static readonly CaptionFormatter English = new(TecLanguage.English);
 
     private static Interaction Click() => new()
     {
@@ -154,7 +155,11 @@ public class CaptionFormatterTests
     [InlineData("es")]
     [InlineData("EN")]
     public void Languages_can_be_found_by_code(string code) =>
-        Assert.NotNull(CaptionLanguage.Find(code));
+        Assert.NotNull(TecLanguage.Find(code));
+
+    [Fact]
+    public void Unsupported_windows_language_falls_back_to_spanish() =>
+        Assert.Equal(TecLanguage.Spanish, TecLanguage.FromCulture(System.Globalization.CultureInfo.GetCultureInfo("fr-FR")));
 
     [Fact]
     public void Every_language_names_every_built_in_kind()
@@ -164,17 +169,10 @@ public class CaptionFormatterTests
             InteractionKind.LeftClick, InteractionKind.RightClick, InteractionKind.MiddleClick, InteractionKind.DoubleClick,
             InteractionKind.KeyboardCommand, InteractionKind.TextInput, InteractionKind.WindowOpened, InteractionKind.ContentChanged,
         ];
-        foreach (var language in CaptionLanguage.All)
-            Assert.All(kinds, kind => Assert.True(language.InteractionKinds.ContainsKey(kind.Code), $"{language.Code}: {kind.Code}"));
-    }
-
-    [Fact]
-    public void Languages_translate_the_same_control_types_and_notes()
-    {
-        var spanish = CaptionLanguage.Spanish;
-        var english = CaptionLanguage.English;
-
-        Assert.Equal(spanish.ControlTypes.Keys.Order(), english.ControlTypes.Keys.Order());
-        Assert.Equal(spanish.Notes.Keys.Order(), english.Notes.Keys.Order());
+        foreach (var language in TecLanguage.All)
+        {
+            var texts = new Texts(CoreResources.Captions, language.Culture);
+            Assert.All(kinds, kind => Assert.NotNull(texts.Find("Kind_" + kind.Code)));
+        }
     }
 }

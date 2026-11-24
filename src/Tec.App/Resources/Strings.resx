@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="TargetGroup" xml:space="preserve">
+    <value>Aplicación a probar</value>
+  </data>
+  <data name="LaunchApp" xml:space="preserve">
+    <value>Iniciar app…</value>
+  </data>
+  <data name="Refresh" xml:space="preserve">
+    <value>Actualizar</value>
+  </data>
+  <data name="OptionsGroup" xml:space="preserve">
+    <value>Opciones</value>
+  </data>
+  <data name="LanguageLabel" xml:space="preserve">
+    <value>Idioma:</value>
+  </data>
+  <data name="CaptureLabel" xml:space="preserve">
+    <value>Capturar:</value>
+  </data>
+  <data name="Clicks" xml:space="preserve">
+    <value>Clicks</value>
+  </data>
+  <data name="KeyboardCommands" xml:space="preserve">
+    <value>Comandos de teclado</value>
+  </data>
+  <data name="TextInput" xml:space="preserve">
+    <value>Texto ingresado</value>
+  </data>
+  <data name="NewWindows" xml:space="preserve">
+    <value>Ventanas nuevas</value>
+  </data>
+  <data name="ScreenChanges" xml:space="preserve">
+    <value>Cambios en pantalla</value>
+  </data>
+  <data name="ScreenChangesTooltip" xml:space="preserve">
+    <value>Overlays de carga, paneles o resultados que aparecen dentro de la misma ventana</value>
+  </data>
+  <data name="AreaLabel" xml:space="preserve">
+    <value>Área:</value>
+  </data>
+  <data name="AreaWindow" xml:space="preserve">
+    <value>Ventana de la aplicación</value>
+  </data>
+  <data name="AreaMonitor" xml:space="preserve">
+    <value>Monitor completo</value>
+  </data>
+  <data name="AreaAllScreens" xml:space="preserve">
+    <value>Todas las pantallas</value>
+  </data>
+  <data name="WindowDelayLabel" xml:space="preserve">
+    <value>Espera de ventanas (ms):</value>
+  </data>
+  <data name="FolderLabel" xml:space="preserve">
+    <value>Carpeta:</value>
+  </data>
+  <data name="Browse" xml:space="preserve">
+    <value>Examinar…</value>
+  </data>
+  <data name="MinimizeOnStart" xml:space="preserve">
+    <value>Minimizar TEC al iniciar la grabación</value>
+  </data>
+  <data name="OpenReport" xml:space="preserve">
+    <value>Abrir reporte</value>
+  </data>
+  <data name="OpenFolder" xml:space="preserve">
+    <value>Abrir carpeta</value>
+  </data>
+  <data name="ViewLogs" xml:space="preserve">
+    <value>Ver logs</value>
+  </data>
+  <data name="Start" xml:space="preserve">
+    <value>● Iniciar</value>
+  </data>
+  <data name="Stop" xml:space="preserve">
+    <value>■ Detener</value>
+  </data>
+  <data name="StatusReady" xml:space="preserve">
+    <value>Selecciona la aplicación a probar y presiona Iniciar.</value>
+  </data>
+  <data name="StatusAppLaunched" xml:space="preserve">
+    <value>Aplicación iniciada: {0}</value>
+  </data>
+  <data name="StatusRecording" xml:space="preserve">
+    <value>Grabando evidencia de {0}. Las interacciones con TEC no se capturan.</value>
+  </data>
+  <data name="StatusRecordingCount" xml:space="preserve">
+    <value>Grabando… {0} evidencias</value>
+  </data>
+  <data name="StatusStopping" xml:space="preserve">
+    <value>Deteniendo y generando el reporte...</value>
+  </data>
+  <data name="StatusFinished" xml:space="preserve">
+    <value>Sesión terminada: {0} evidencias en {1}</value>
+  </data>
+  <data name="StatusFinishedWithErrors" xml:space="preserve">
+    <value>La sesión terminó con errores (detalle en el log).</value>
+  </data>
+  <data name="StatusError" xml:space="preserve">
+    <value>Error: {0} (detalle en el log)</value>
+  </data>
+  <data name="ErrorProcessList" xml:space="preserve">
+    <value>No se pudo obtener la lista de aplicaciones.</value>
+  </data>
+  <data name="ErrorLaunch" xml:space="preserve">
+    <value>No se pudo iniciar la aplicación {0}.</value>
+  </data>
+  <data name="ErrorStart" xml:space="preserve">
+    <value>No se pudo iniciar la sesión.</value>
+  </data>
+  <data name="ErrorStop" xml:space="preserve">
+    <value>Ocurrió un error al detener la sesión o al generar el reporte.</value>
+  </data>
+  <data name="ErrorOpen" xml:space="preserve">
+    <value>No se pudo abrir {0}.</value>
+  </data>
+  <data name="ErrorUnexpected" xml:space="preserve">
+    <value>Ocurrió un error inesperado.</value>
+  </data>
+  <data name="ErrorDetails" xml:space="preserve">
+    <value>{0}
+
+{1}
+
+Detalle en el log: {2}</value>
+  </data>
+  <data name="PickFolderTitle" xml:space="preserve">
+    <value>Carpeta de evidencias</value>
+  </data>
+  <data name="PickExecutableTitle" xml:space="preserve">
+    <value>Aplicación a probar</value>
+  </data>
+  <data name="ExecutableFilter" xml:space="preserve">
+    <value>Aplicaciones (*.exe)|*.exe</value>
+  </data>
+</root>

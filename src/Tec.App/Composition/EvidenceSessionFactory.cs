@@ -1,8 +1,8 @@
 using Tec.Core.Abstractions;
+using Tec.Core.Localization;
 using Tec.Core.Model;
 using Tec.Core.Reporting;
 using Tec.Core.Services;
-using Tec.Core.Services.Captions;
 using Tec.Windows.Capture;
 using Tec.Windows.Imaging;
 using Tec.Windows.Sources;
@@ -22,7 +22,7 @@ public sealed record SessionSettings
     public required TargetProcessInfo Target { get; init; }
     public required string OutputRoot { get; init; }
     public CaptureArea Area { get; init; } = CaptureArea.Window;
-    public CaptionLanguage CaptionLanguage { get; init; } = CaptionLanguage.Spanish;
+    public TecLanguage Language { get; init; } = TecLanguage.Spanish;
     public bool CaptureClicks { get; init; } = true;
     public bool CaptureKeyboardCommands { get; init; } = true;
     public bool CaptureTextInput { get; init; } = true;
@@ -80,7 +80,7 @@ public static class EvidenceSessionFactory
 
         var composer = new EvidenceComposer(
             new ContrastingHighlightColorSelector(),
-            new CaptionFormatter(settings.CaptionLanguage),
+            new CaptionFormatter(settings.Language),
             new GdiFrameAnnotator());
 
         var encoder = new PngImageEncoder();
@@ -89,7 +89,7 @@ public static class EvidenceSessionFactory
         [
             new ImageFileEvidenceSink(encoder, namer),
             new JsonLinesEvidenceLogSink(namer),
-            new HtmlReportSink(namer, clock),
+            new HtmlReportSink(namer, clock, settings.Language),
         ];
 
         var collector = new EvidenceCollector(sources, filter, snapshotter, composer, sinks);

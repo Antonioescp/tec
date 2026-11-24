@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Windows;
 using System.Windows.Threading;
+using Tec.App.Localization;
 using Tec.App.Services;
 using Tec.App.ViewModels;
 using Tec.Core.Diagnostics;
@@ -18,6 +19,10 @@ public partial class App : Application
     public static string LogDirectory { get; } = System.IO.Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "TEC", "logs");
 
+    /// <summary>Preferences file: %LOCALAPPDATA%\TEC\settings.json.</summary>
+    public static string SettingsFile { get; } = System.IO.Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "TEC", "settings.json");
+
     private FileLogWriter? _logWriter;
 
     protected override void OnStartup(StartupEventArgs e)
@@ -25,7 +30,7 @@ public partial class App : Application
         ConfigureLogging();
         base.OnStartup(e);
 
-        var viewModel = new MainViewModel(new TargetProcessCatalog(), new WpfUserDialogs(), LogDirectory);
+        var viewModel = new MainViewModel(new TargetProcessCatalog(), new WpfUserDialogs(), new JsonUserSettingsStore(SettingsFile), LogDirectory);
         var window = new MainWindow(viewModel);
         MainWindow = window;
         window.Show();
@@ -70,7 +75,7 @@ public partial class App : Application
     {
         Log.Error(Category, "Excepción no controlada en la interfaz.", e.Exception);
         MessageBox.Show(
-            $"Ocurrió un error inesperado.\n\n{e.Exception.Message}\n\nDetalle en el log: {LogDirectory}",
+            Localizer.Instance.Format("ErrorDetails", Localizer.Instance["ErrorUnexpected"], e.Exception.Message, LogDirectory),
             "TEC", MessageBoxButton.OK, MessageBoxImage.Error);
         e.Handled = true; // keep the app open so the current session is not lost
     }

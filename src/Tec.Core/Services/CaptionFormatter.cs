@@ -1,20 +1,29 @@
 using System.Globalization;
 using Tec.Core.Abstractions;
+using Tec.Core.Localization;
 using Tec.Core.Model;
 
-namespace Tec.Core.Services.Captions;
+namespace Tec.Core.Services;
 
 /// <summary>
 /// Captions in the given language, e.g. <c>#003 · Left click: button "Process"</c> or
 /// <c>#003 · Click izquierdo: botón "Procesar"</c>.
 /// </summary>
-public sealed class CaptionFormatter(CaptionLanguage language) : IInteractionCaptionFormatter
+/// <remarks>
+/// Interactions carry language-independent data (kind codes, key names, UI Automation
+/// control types, note codes) that is translated with <c>Resources/Captions*.resx</c>.
+/// Missing entries fall back to the raw value, so new kinds, keys or notes still produce
+/// a readable caption.
+/// </remarks>
+public sealed class CaptionFormatter(TecLanguage language) : IInteractionCaptionFormatter
 {
     private const int MaxValueLength = 120;
     private const string Separator = "   ·   ";
     private const string MaskedValue = "••••••";
 
-    public CaptionLanguage Language { get; } = language;
+    private readonly Texts _texts = new(CoreResources.Captions, language.Culture);
+
+    public TecLanguage Language { get; } = language;
 
     public InteractionCaption Format(int sequence, Interaction interaction)
     {
@@ -27,9 +36,9 @@ public sealed class CaptionFormatter(CaptionLanguage language) : IInteractionCap
             interaction.Timestamp.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture),
         };
         if (!string.IsNullOrWhiteSpace(interaction.WindowTitle))
-            details.Add(Text(Language.WindowFormat, interaction.WindowTitle));
+            details.Add(_texts.Format("Window", interaction.WindowTitle));
         if (interaction.Point is { } p)
-            details.Add(Text(Language.PositionFormat, p.X, p.Y));
+            details.Add(_texts.Format("Position", p.X, p.Y));
         details.AddRange(interaction.Notes.Select(DescribeNote));
 
         return new InteractionCaption(title, string.Join(Separator, details));
@@ -43,7 +52,7 @@ public sealed class CaptionFormatter(CaptionLanguage language) : IInteractionCap
         if (kind == InteractionKind.KeyboardCommand)
         {
             var keys = DescribeKeys(interaction);
-            return element is null ? keys : Text(Language.CommandOnElementFormat, keys, DescribeElement(element));
+            return element is null ? keys : _texts.Format("CommandOnElement", keys, DescribeElement(element));
         }
 
         if (kind == InteractionKind.TextInput)
@@ -57,34 +66,30 @@ public sealed class CaptionFormatter(CaptionLanguage language) : IInteractionCap
             return string.IsNullOrWhiteSpace(interaction.WindowTitle) ? interaction.Description : $"\"{interaction.WindowTitle}\"";
 
         if (kind == InteractionKind.ContentChanged && interaction.ChangedFraction is { } fraction)
-            return Text(Language.ContentChangedFormat, fraction);
+            return _texts.Format("ContentChanged", fraction);
 
         return element is null ? interaction.Description : DescribeElement(element);
     }
 
-    private string KindName(InteractionKind kind) =>
-        Language.InteractionKinds.GetValueOrDefault(kind.Code, kind.DisplayName);
+    private string KindName(InteractionKind kind) => _texts.Find("Kind_" + kind.Code) ?? kind.DisplayName;
 
     private string? DescribeKeys(Interaction interaction) =>
         interaction.Keys.Count == 0
             ? interaction.Description
-            : string.Join("+", interaction.Keys.Select(key => Language.Keys.GetValueOrDefault(key, key)));
+            : string.Join("+", interaction.Keys.Select(key => _texts.Find("Key_" + key) ?? key));
 
     private string DescribeElement(UiElementInfo element)
     {
-        var type = element.ControlTypeId is { } id && Language.ControlTypes.TryGetValue(id, out var name)
-            ? name
-            : !string.IsNullOrWhiteSpace(element.ControlType) ? element.ControlType : Language.UnknownElement;
+        var type = (element.ControlTypeId is { } id ? _texts.Find("ControlType_" + id) : null)
+            ?? (string.IsNullOrWhiteSpace(element.ControlType) ? _texts.Get("UnknownElement") : element.ControlType);
         var label = !string.IsNullOrWhiteSpace(element.Name) ? element.Name : element.AutomationId;
         return string.IsNullOrWhiteSpace(label) ? type : $"{type} \"{label}\"";
     }
 
     private string DescribeNote(InteractionNote note) =>
-        Language.Notes.TryGetValue(note.Code, out var format)
-            ? Text(format, note.Detail)
+        _texts.Find("Note_" + note.Code) is { } format
+            ? string.Format(_texts.Culture, format, note.Detail)
             : note.Detail ?? note.Code;
-
-    private string Text(string format, params object?[] args) => string.Format(Language.Culture, format, args);
 
     private static string? Truncate(string? value) =>
         value is { Length: > MaxValueLength } ? value[..MaxValueLength] + "…" : value;
