@@ -1,5 +1,4 @@
 using System.Runtime.InteropServices;
-using System.Text;
 
 namespace Tec.Windows.Native;
 
@@ -158,13 +157,13 @@ internal static class NativeMethods
     public static extern uint GetWindowThreadProcessId(nint hWnd, out uint lpdwProcessId);
 
     [DllImport("user32.dll", CharSet = CharSet.Unicode)]
-    public static extern int GetWindowText(nint hWnd, StringBuilder lpString, int nMaxCount);
+    public static extern int GetWindowText(nint hWnd, [Out] char[] lpString, int nMaxCount);
 
     [DllImport("user32.dll", CharSet = CharSet.Unicode)]
     public static extern int GetWindowTextLength(nint hWnd);
 
     [DllImport("user32.dll", CharSet = CharSet.Unicode)]
-    public static extern int GetClassName(nint hWnd, StringBuilder lpClassName, int nMaxCount);
+    public static extern int GetClassName(nint hWnd, [Out] char[] lpClassName, int nMaxCount);
 
     [DllImport("user32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]

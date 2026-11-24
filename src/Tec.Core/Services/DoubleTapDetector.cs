@@ -18,6 +18,7 @@ public sealed class DoubleTapDetector<TKey>(TimeSpan maxInterval) where TKey : s
     private DateTimeOffset _lastTapAt;
 
     /// <param name="tapKey">La tecla si puede formar una doble pulsación; <c>null</c> para cualquier otra.</param>
+    /// <param name="at">Momento en que se presionó la tecla.</param>
     public void KeyDown(TKey? tapKey, DateTimeOffset at)
     {
         if (tapKey is not { } key)

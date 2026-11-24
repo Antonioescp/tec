@@ -1,4 +1,3 @@
-using System.Text;
 using Tec.Core.Model;
 using static Tec.Windows.Native.NativeMethods;
 
@@ -22,7 +21,7 @@ internal static class Win32Window
     public static int? GetProcessId(nint hwnd)
     {
         if (hwnd == 0) return null;
-        GetWindowThreadProcessId(hwnd, out var pid);
+        _ = GetWindowThreadProcessId(hwnd, out var pid);
         return pid == 0 ? null : (int)pid;
     }
 
@@ -31,16 +30,16 @@ internal static class Win32Window
         if (hwnd == 0) return string.Empty;
         var length = GetWindowTextLength(hwnd);
         if (length <= 0) return string.Empty;
-        var sb = new StringBuilder(length + 1);
-        GetWindowText(hwnd, sb, sb.Capacity);
-        return sb.ToString();
+        var buffer = new char[length + 1];
+        var copied = GetWindowText(hwnd, buffer, buffer.Length);
+        return new string(buffer, 0, Math.Max(copied, 0));
     }
 
     public static string GetClassName(nint hwnd)
     {
-        var sb = new StringBuilder(256);
-        NativeMethods.GetClassName(hwnd, sb, sb.Capacity);
-        return sb.ToString();
+        var buffer = new char[256];
+        var copied = NativeMethods.GetClassName(hwnd, buffer, buffer.Length);
+        return new string(buffer, 0, Math.Max(copied, 0));
     }
 
     public static bool Exists(nint hwnd) => hwnd != 0 && IsWindow(hwnd);

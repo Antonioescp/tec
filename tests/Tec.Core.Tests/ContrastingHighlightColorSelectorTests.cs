@@ -56,13 +56,13 @@ public class ContrastingHighlightColorSelectorTests
     {
         var image = frame.Image;
         for (var y = 0; y < image.Height; y++)
-        for (var x = 0; x < image.Width; x++)
-        {
-            if (highlight.Contains(x + frame.Bounds.Left, y + frame.Bounds.Top)) continue;
-            var i = y * image.Stride + x * RasterImage.BytesPerPixel;
-            image.Pixels[i] = color.B;
-            image.Pixels[i + 1] = color.G;
-            image.Pixels[i + 2] = color.R;
-        }
+            for (var x = 0; x < image.Width; x++)
+            {
+                if (highlight.Contains(x + frame.Bounds.Left, y + frame.Bounds.Top)) continue;
+                var i = y * image.Stride + x * RasterImage.BytesPerPixel;
+                image.Pixels[i] = color.B;
+                image.Pixels[i + 1] = color.G;
+                image.Pixels[i + 2] = color.R;
+            }
     }
 }

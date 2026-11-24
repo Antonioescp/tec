@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Windows;
 using System.Windows.Threading;
 using Tec.App.Services;
@@ -8,6 +9,7 @@ using Tec.Windows.Processes;
 
 namespace Tec.App;
 
+[SuppressMessage("Reliability", "CA1001", Justification = "WPF no desecha Application; el log se cierra en OnExit.")]
 public partial class App : Application
 {
     private const string Category = "App";

@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text;
 using Tec.Core.Abstractions;
 
@@ -5,7 +6,7 @@ namespace Tec.Core.Diagnostics;
 
 /// <summary>
 /// Escribe los logs en un archivo de texto por día (<c>tec-AAAA-MM-DD.log</c>) y borra los
-/// que tengan más de <paramref name="retentionDays"/> días. Cada línea se escribe y se vacía
+/// que tengan más de <c>retentionDays</c> días. Cada línea se escribe y se vacía
 /// al disco de inmediato para no perder el último mensaje si la aplicación se cierra de golpe.
 /// </summary>
 public sealed class FileLogWriter : ILogWriter, IDisposable
@@ -66,9 +67,9 @@ public sealed class FileLogWriter : ILogWriter, IDisposable
     internal static string Format(DateTimeOffset time, LogLevel level, string category, string message, Exception? exception)
     {
         var builder = new StringBuilder()
-            .Append(time.ToString("yyyy-MM-dd HH:mm:ss.fff"))
+            .Append(time.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture))
             .Append(' ').Append(LevelName(level))
-            .Append(" [").Append(Environment.CurrentManagedThreadId.ToString().PadLeft(3)).Append("] ")
+            .Append(" [").Append(Environment.CurrentManagedThreadId.ToString(CultureInfo.InvariantCulture).PadLeft(3)).Append("] ")
             .Append(category).Append(": ").Append(message)
             .AppendLine();
         if (exception is not null) builder.AppendLine(exception.ToString());

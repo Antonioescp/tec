@@ -70,7 +70,7 @@ public sealed class GdiScreenCapturer : IScreenCapturer
             finally
             {
                 graphics.ReleaseHdc(bitmapDc);
-                NativeMethods.ReleaseDC(0, screenDc);
+                _ = NativeMethods.ReleaseDC(0, screenDc);
             }
         }
         return new CapturedFrame(region, BitmapConversions.ToRasterImage(bitmap));

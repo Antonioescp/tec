@@ -58,7 +58,7 @@ public static class EvidenceSessionFactory
 {
     public static RunningSession Create(SessionSettings settings)
     {
-        IClock clock = SystemClock.Instance;
+        var clock = SystemClock.Instance;
         var owned = new List<IDisposable>();
 
         var sources = CreateSources(settings, clock);

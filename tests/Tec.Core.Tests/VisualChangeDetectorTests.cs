@@ -108,13 +108,13 @@ public class VisualChangeDetectorTests
         foreach (var (x0, y0, w, h, color) in rects)
         {
             for (var y = y0; y < Math.Min(height, y0 + h); y++)
-            for (var x = x0; x < Math.Min(width, x0 + w); x++)
-            {
-                var i = y * image.Stride + x * RasterImage.BytesPerPixel;
-                image.Pixels[i] = color.B;
-                image.Pixels[i + 1] = color.G;
-                image.Pixels[i + 2] = color.R;
-            }
+                for (var x = x0; x < Math.Min(width, x0 + w); x++)
+                {
+                    var i = y * image.Stride + x * RasterImage.BytesPerPixel;
+                    image.Pixels[i] = color.B;
+                    image.Pixels[i + 1] = color.G;
+                    image.Pixels[i + 2] = color.R;
+                }
         }
         return image;
     }

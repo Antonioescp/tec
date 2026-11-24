@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Net;
 using System.Text;
@@ -10,6 +11,7 @@ namespace Tec.Core.Reporting;
 /// Reporte HTML (<c>reporte.html</c>) con las evidencias en orden. Se reescribe con cada
 /// evidencia para que el reporte exista aunque la sesión no se cierre correctamente.
 /// </summary>
+[SuppressMessage("Reliability", "CA1001", Justification = "El SemaphoreSlim no usa AvailableWaitHandle, así que no retiene recursos nativos.")]
 public sealed class HtmlReportSink(IEvidenceFileNamer namer, IClock clock) : IEvidenceSink
 {
     public const string FileName = "reporte.html";

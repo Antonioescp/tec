@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using Tec.Core.Abstractions;
@@ -33,6 +34,7 @@ public sealed class ImageFileEvidenceSink(IImageEncoder encoder, IEvidenceFileNa
 }
 
 /// <summary>Bitácora de metadatos en formato JSON Lines (<c>evidencias.jsonl</c>).</summary>
+[SuppressMessage("Reliability", "CA1001", Justification = "El SemaphoreSlim no usa AvailableWaitHandle, así que no retiene recursos nativos.")]
 public sealed class JsonLinesEvidenceLogSink(IEvidenceFileNamer namer) : IEvidenceSink
 {
     public const string FileName = "evidencias.jsonl";
