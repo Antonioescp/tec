@@ -20,6 +20,26 @@ public sealed record CaptureAreaOption(CaptureArea Value, string Label)
     public override string ToString() => Label;
 }
 
+/// <summary>A process the tester can mark to be followed by the session.</summary>
+public sealed class ProcessOption(TargetProcessInfo process, Action onChanged) : ObservableObject
+{
+    private bool _isSelected;
+
+    public TargetProcessInfo Process { get; } = process;
+    public string Name { get; } = process.ToString();
+
+    public bool IsSelected
+    {
+        get => _isSelected;
+        set
+        {
+            if (SetProperty(ref _isSelected, value)) onChanged();
+        }
+    }
+
+    public override string ToString() => Name;
+}
+
 public sealed class MainViewModel : ObservableObject
 {
     private const string LogCategory = "UI";
@@ -31,7 +51,6 @@ public sealed class MainViewModel : ObservableObject
     private readonly Localizer _localizer = Localizer.Instance;
 
     private RunningSession? _session;
-    private TargetProcessInfo? _selectedProcess;
     private IReadOnlyList<CaptureAreaOption> _captureAreas = [];
     private CaptureAreaOption _selectedArea = null!;
     private string _outputRoot;
@@ -60,7 +79,7 @@ public sealed class MainViewModel : ObservableObject
         RefreshProcessesCommand = new RelayCommand(RefreshProcesses, () => !IsRunning);
         LaunchCommand = new RelayCommand(Launch, () => !IsRunning);
         BrowseOutputCommand = new RelayCommand(BrowseOutput, () => !IsRunning);
-        StartCommand = new AsyncRelayCommand(StartAsync, () => !IsRunning && SelectedProcess is not null);
+        StartCommand = new AsyncRelayCommand(StartAsync, () => !IsRunning && HasSelectedProcesses);
         StopCommand = new AsyncRelayCommand(StopAsync, () => IsRunning);
         OpenReportCommand = new RelayCommand(OpenReport, () => CurrentSessionDirectory is not null);
         OpenFolderCommand = new RelayCommand(OpenFolder, () => CurrentSessionDirectory is not null);
@@ -70,7 +89,7 @@ public sealed class MainViewModel : ObservableObject
         RefreshProcesses();
     }
 
-    public ObservableCollection<TargetProcessInfo> Processes { get; } = [];
+    public ObservableCollection<ProcessOption> Processes { get; } = [];
     public ObservableCollection<EvidenceItem> Evidences { get; } = [];
     public IReadOnlyList<CaptureAreaOption> CaptureAreas { get => _captureAreas; private set => SetProperty(ref _captureAreas, value); }
     public IReadOnlyList<TecLanguage> Languages { get; } = TecLanguage.All;
@@ -85,8 +104,13 @@ public sealed class MainViewModel : ObservableObject
     public ICommand OpenEvidenceCommand { get; }
     public ICommand OpenLogsCommand { get; }
 
-    public TargetProcessInfo? SelectedProcess { get => _selectedProcess; set => SetProperty(ref _selectedProcess, value); }
     public CaptureAreaOption SelectedArea { get => _selectedArea; set => SetProperty(ref _selectedArea, value); }
+
+    /// <summary>Applications the next session will follow.</summary>
+    public IReadOnlyList<TargetProcessInfo> SelectedProcesses =>
+        [.. Processes.Where(p => p.IsSelected).Select(p => p.Process)];
+
+    public bool HasSelectedProcesses => Processes.Any(p => p.IsSelected);
 
     /// <summary>Language of the interface, captions and report. It is remembered between runs.</summary>
     public TecLanguage Language
@@ -121,18 +145,27 @@ public sealed class MainViewModel : ObservableObject
 
     private void RefreshProcesses()
     {
-        var selectedId = SelectedProcess?.ProcessId;
+        HashSet<int> selectedIds = [.. Processes.Where(p => p.IsSelected).Select(p => p.Process.ProcessId)];
         Processes.Clear();
         try
         {
-            foreach (var process in _catalog.GetCandidates()) Processes.Add(process);
+            foreach (var process in _catalog.GetCandidates())
+                Processes.Add(new ProcessOption(process, OnProcessSelectionChanged) { IsSelected = selectedIds.Contains(process.ProcessId) });
         }
         catch (Exception ex)
         {
             ShowError(_localizer["ErrorProcessList"], ex);
         }
         Log.Debug(LogCategory, $"Lista de aplicaciones actualizada: {Processes.Count} procesos.");
-        SelectedProcess = Processes.FirstOrDefault(p => p.ProcessId == selectedId);
+        OnProcessSelectionChanged();
+    }
+
+    /// <summary>Keeps the marks of the application list in sync with the Start button.</summary>
+    private void OnProcessSelectionChanged()
+    {
+        OnPropertyChanged(nameof(HasSelectedProcesses));
+        OnPropertyChanged(nameof(SelectedProcesses));
+        CommandManager.InvalidateRequerySuggested();
     }
 
     private void Launch()
@@ -145,18 +178,23 @@ public sealed class MainViewModel : ObservableObject
             var launched = _catalog.Launch(path, TimeSpan.FromSeconds(15));
             Log.Info(LogCategory, $"Aplicación iniciada: {launched} (PID {launched.ProcessId}).");
             RefreshProcesses();
-            SelectedProcess = Processes.FirstOrDefault(p => p.ProcessId == launched.ProcessId);
-            if (SelectedProcess is null)
-            {
-                Processes.Add(launched);
-                SelectedProcess = launched;
-            }
+            // The application just launched joins the marked ones without clearing the rest.
+            var option = Processes.FirstOrDefault(p => p.Process.ProcessId == launched.ProcessId)
+                ?? AddProcessOption(launched);
+            option.IsSelected = true;
             SetStatus(() => _localizer.Format("StatusAppLaunched", launched));
         }
         catch (Exception ex)
         {
             ShowError(_localizer.Format("ErrorLaunch", path), ex);
         }
+    }
+
+    private ProcessOption AddProcessOption(TargetProcessInfo process)
+    {
+        var option = new ProcessOption(process, OnProcessSelectionChanged);
+        Processes.Add(option);
+        return option;
     }
 
     private void BrowseOutput()
@@ -167,12 +205,13 @@ public sealed class MainViewModel : ObservableObject
 
     private async Task StartAsync()
     {
-        if (SelectedProcess is not { } target) return;
+        var targets = SelectedProcesses;
+        if (targets.Count == 0) return;
         try
         {
             var settings = new SessionSettings
             {
-                Target = target,
+                Targets = targets,
                 OutputRoot = OutputRoot,
                 Area = SelectedArea.Value,
                 Language = Language,
@@ -183,11 +222,14 @@ public sealed class MainViewModel : ObservableObject
                 CaptureContentChanges = CaptureContentChanges,
                 WindowSettleDelay = TimeSpan.FromMilliseconds(WindowSettleDelayMs),
             };
-            Log.Info(LogCategory, $"Iniciando sesión: {settings}");
+            Log.Info(LogCategory, $"Iniciando sesión con {targets.Count} aplicación(es): {string.Join(", ", targets.Select(t => t.ToString()))}.");
 
             var session = await Task.Run(() => EvidenceSessionFactory.Create(settings));
             session.Collector.EvidenceCollected += (_, evidence) => OnEvidenceCollected(session, evidence);
             session.Collector.ErrorOccurred += (_, ex) => OnUi(() => SetStatus(() => _localizer.Format("StatusError", ex.Message)));
+            session.Targets.TargetLost += (_, target) => OnUi(() =>
+                // Only the status line: a modal dialog would take the focus away from the app under test.
+                SetStatus(() => _localizer.Format("StatusTargetLost", target.ProcessName)));
             try
             {
                 await session.Collector.StartAsync(session.Session);
@@ -202,7 +244,7 @@ public sealed class MainViewModel : ObservableObject
             _session = session;
             Evidences.Clear();
             CurrentSessionDirectory = session.Session.OutputDirectory;
-            SetStatus(() => _localizer.Format("StatusRecording", target.ProcessName));
+            SetStatus(() => _localizer.Format("StatusRecording", string.Join(" + ", targets.Select(t => t.ProcessName))));
             NotifyRunningChanged();
             Log.Info(LogCategory, $"Sesión iniciada en {session.Session.OutputDirectory}");
 

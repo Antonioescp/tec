@@ -5,6 +5,7 @@ using Tec.Core.Reporting;
 using Tec.Core.Services;
 using Tec.Windows.Capture;
 using Tec.Windows.Imaging;
+using Tec.Windows.Processes;
 using Tec.Windows.Sources;
 using Tec.Windows.Uia;
 
@@ -19,7 +20,7 @@ public enum CaptureArea
 
 public sealed record SessionSettings
 {
-    public required TargetProcessInfo Target { get; init; }
+    public required IReadOnlyList<TargetProcessInfo> Targets { get; init; }
     public required string OutputRoot { get; init; }
     public CaptureArea Area { get; init; } = CaptureArea.Window;
     public TecLanguage Language { get; init; } = TecLanguage.Spanish;
@@ -36,10 +37,14 @@ public sealed class RunningSession(
     EvidenceSession session,
     EvidenceCollector collector,
     IEvidenceFileNamer fileNamer,
-    IReadOnlyList<IDisposable> ownedResources) : IAsyncDisposable
+    IReadOnlyList<IDisposable> ownedResources,
+    TrackedTargets trackedTargets) : IAsyncDisposable
 {
     public EvidenceSession Session { get; } = session;
     public EvidenceCollector Collector { get; } = collector;
+
+    /// <summary>The applications this session follows, and which of them have stopped.</summary>
+    public TrackedTargets Targets { get; } = trackedTargets;
 
     public string GetImagePath(Evidence evidence) =>
         System.IO.Path.Combine(Session.OutputDirectory, fileNamer.GetImageFileName(evidence));
@@ -63,14 +68,18 @@ public static class EvidenceSessionFactory
         var clock = SystemClock.Instance;
         var owned = new List<IDisposable>();
 
-        var sources = CreateSources(settings, clock);
+        var targets = new TrackedTargets(settings.Targets);
+        var watcher = new TrackedProcessWatcher(targets);
+        owned.Add(watcher);
+
+        var sources = CreateSources(settings, [.. targets.ProcessIds], clock);
         owned.AddRange(sources);
 
         var focusTracker = new FocusTracker(clock);
         focusTracker.Start();
         owned.Add(focusTracker);
 
-        var filter = new ProcessInteractionFilter([settings.Target.ProcessId]);
+        var filter = new ProcessInteractionFilter(targets.ProcessIds);
 
         var snapshotter = new InteractionSnapshotter(
             CreateRegionProvider(settings.Area),
@@ -89,15 +98,19 @@ public static class EvidenceSessionFactory
         [
             new ImageFileEvidenceSink(encoder, namer),
             new JsonLinesEvidenceLogSink(namer),
-            new HtmlReportSink(namer, clock, settings.Language),
+            new HtmlReportSink(namer, clock, settings.Language, () => targets.LostNames),
         ];
 
         var collector = new EvidenceCollector(sources, filter, snapshotter, composer, sinks);
-        var session = EvidenceSession.Create(settings.OutputRoot, settings.Target.ProcessName, clock.Now);
-        return new RunningSession(session, collector, namer, owned);
+        var session = EvidenceSession.Create(settings.OutputRoot, [.. settings.Targets.Select(t => t.ProcessName)], clock.Now);
+        var running = new RunningSession(session, collector, namer, owned, targets);
+
+        // Watching starts once everything is in place, so a lost application is never missed silently.
+        watcher.Start();
+        return running;
     }
 
-    private static List<IInteractionSource> CreateSources(SessionSettings settings, IClock clock)
+    private static List<IInteractionSource> CreateSources(SessionSettings settings, IReadOnlyList<int> processIds, IClock clock)
     {
         var sources = new List<IInteractionSource>();
         if (settings.CaptureClicks)
@@ -113,7 +126,7 @@ public static class EvidenceSessionFactory
         if (settings.CaptureContentChanges)
             sources.Add(new ContentChangeSource(
                 clock,
-                new TargetForegroundWindowProvider([settings.Target.ProcessId]),
+                new TargetForegroundWindowProvider(processIds),
                 new PrintWindowContentCapturer()));
         return sources;
     }

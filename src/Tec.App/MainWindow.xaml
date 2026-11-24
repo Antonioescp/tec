@@ -6,13 +6,39 @@
         Width="760" Height="600" MinWidth="560" MinHeight="420"
         WindowStartupLocation="CenterScreen">
     <DockPanel Margin="12">
-        <!-- Application under test -->
+        <!-- Applications under test -->
         <GroupBox DockPanel.Dock="Top" Header="{Binding [TargetGroup], Source={x:Static loc:Localizer.Instance}}" Padding="6">
-            <DockPanel IsEnabled="{Binding IsIdle}">
-                <Button DockPanel.Dock="Right" Content="{Binding [LaunchApp], Source={x:Static loc:Localizer.Instance}}" Command="{Binding LaunchCommand}" />
-                <Button DockPanel.Dock="Right" Content="{Binding [Refresh], Source={x:Static loc:Localizer.Instance}}" Command="{Binding RefreshProcessesCommand}" />
-                <ComboBox ItemsSource="{Binding Processes}" SelectedItem="{Binding SelectedProcess}" />
-            </DockPanel>
+            <Grid IsEnabled="{Binding IsIdle}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Grid.Column="0" Margin="0,0,8,0" TextWrapping="Wrap" Foreground="#666"
+                           Text="{Binding [TargetHint], Source={x:Static loc:Localizer.Instance}}" />
+                <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
+                    <Button Content="{Binding [Refresh], Source={x:Static loc:Localizer.Instance}}" Command="{Binding RefreshProcessesCommand}" />
+                    <Button Content="{Binding [LaunchApp], Source={x:Static loc:Localizer.Instance}}" Command="{Binding LaunchCommand}" />
+                </StackPanel>
+
+                <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,8,0,0"
+                        BorderBrush="#FFCCCCCC" BorderThickness="1">
+                    <ScrollViewer MaxHeight="132" VerticalScrollBarVisibility="Auto">
+                        <ItemsControl ItemsSource="{Binding Processes}" Margin="2">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <CheckBox Content="{Binding Name}" IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                              Margin="2,1" HorizontalContentAlignment="Left" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Border>
+            </Grid>
         </GroupBox>
 
         <!-- Options -->

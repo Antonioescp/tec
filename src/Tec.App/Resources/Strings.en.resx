@@ -13,7 +13,13 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="TargetGroup" xml:space="preserve">
-    <value>Application under test</value>
+    <value>Applications under test</value>
+  </data>
+  <data name="TargetHint" xml:space="preserve">
+    <value>Mark one or more applications. TEC captures interactions with any of them.</value>
+  </data>
+  <data name="StatusTargetLost" xml:space="preserve">
+    <value>{0} closed; recording continues with the other applications.</value>
   </data>
   <data name="LaunchApp" xml:space="preserve">
     <value>Launch app…</value>
