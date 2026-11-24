@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/samples/">
+    <Project Path="samples/Tec.SampleApp/Tec.SampleApp.csproj" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/Tec.App/Tec.App.csproj" />
+    <Project Path="src/Tec.Core/Tec.Core.csproj" />
+    <Project Path="src/Tec.Windows/Tec.Windows.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Tec.Core.Tests/Tec.Core.Tests.csproj" />
+  </Folder>
+</Solution>
