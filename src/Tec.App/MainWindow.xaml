@@ -43,6 +43,8 @@
                     <ComboBox Width="200" ItemsSource="{Binding CaptureAreas}" SelectedItem="{Binding SelectedArea}" DisplayMemberPath="Label" />
                     <TextBlock Text="Espera de ventanas (ms):" VerticalAlignment="Center" Margin="16,0,6,0" />
                     <TextBox Width="60" Text="{Binding WindowSettleDelayMs, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center" />
+                    <TextBlock Text="Idioma de las leyendas:" VerticalAlignment="Center" Margin="16,0,6,0" />
+                    <ComboBox Width="100" ItemsSource="{Binding CaptionLanguages}" SelectedItem="{Binding CaptionLanguage}" DisplayMemberPath="Name" />
                 </StackPanel>
 
                 <TextBlock Grid.Row="2" Text="Carpeta:" VerticalAlignment="Center" Margin="0,6,8,0" />

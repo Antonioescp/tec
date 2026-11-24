@@ -106,7 +106,7 @@ public sealed class KeyboardSource : MessageLoopInteractionSource
         {
             FlushText();
             var name = ToTapKey(vk)!.Value.ToString();
-            RaiseKeyboard(InteractionKind.KeyboardCommand, $"{name} + {name}");
+            RaiseKeyboard(InteractionKind.KeyboardCommand, [name, name]);
         }
     }
 
@@ -132,7 +132,7 @@ public sealed class KeyboardSource : MessageLoopInteractionSource
         {
             FlushText();
             if (!isRepeat && _options.CaptureCommands)
-                RaiseKeyboard(InteractionKind.KeyboardCommand, KeyNames.Format(_ctrl, _alt, _shift, _win, vk));
+                RaiseKeyboard(InteractionKind.KeyboardCommand, KeyNames.Combination(_ctrl, _alt, _shift, _win, vk));
             return;
         }
 
@@ -192,14 +192,14 @@ public sealed class KeyboardSource : MessageLoopInteractionSource
         });
     }
 
-    private void RaiseKeyboard(InteractionKind kind, string description)
+    private void RaiseKeyboard(InteractionKind kind, IReadOnlyList<string> keys)
     {
         var window = Win32Window.GetRoot(GetForegroundWindow());
         Raise(new Interaction
         {
             Kind = kind,
             Timestamp = Clock.Now,
-            Description = description,
+            Keys = keys,
             WindowHandle = window,
             ProcessId = Win32Window.GetProcessId(window),
         });

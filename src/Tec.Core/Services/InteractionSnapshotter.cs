@@ -31,7 +31,7 @@ public sealed class InteractionSnapshotter(
             catch (Exception ex)
             {
                 Log.Warning("Captura", $"El enriquecedor {enricher.GetType().Name} falló para {interaction.Kind}.", ex);
-                interaction = interaction.WithNote($"No se pudo obtener información adicional ({enricher.GetType().Name}: {ex.Message})");
+                interaction = interaction.WithNote(InteractionNote.EnrichmentFailed($"{enricher.GetType().Name}: {ex.Message}"));
             }
         }
 

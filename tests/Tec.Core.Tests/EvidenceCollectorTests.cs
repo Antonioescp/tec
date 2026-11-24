@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using Tec.Core.Abstractions;
 using Tec.Core.Model;
 using Tec.Core.Services;
+using Tec.Core.Services.Captions;
 
 namespace Tec.Core.Tests;
 
@@ -119,7 +120,7 @@ public class EvidenceCollectorTests
             new FixedClock(Now));
         var composer = new EvidenceComposer(
             new ContrastingHighlightColorSelector(),
-            new SpanishCaptionFormatter(),
+            new CaptionFormatter(CaptionLanguage.Spanish),
             new PassThroughAnnotator());
         return new EvidenceCollector([source], filter, snapshotter, composer, [sink]);
     }

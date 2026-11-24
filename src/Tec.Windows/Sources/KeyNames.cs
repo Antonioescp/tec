@@ -33,37 +33,42 @@ internal static class KeyNames
     public static bool IsNavigationKey(int vk) =>
         vk is VK_TAB or (>= VK_PRIOR and <= VK_DOWN) or VK_INSERT or VK_CAPITAL or VK_NUMLOCK or VK_SCROLL;
 
-    public static string Format(bool ctrl, bool alt, bool shift, bool win, int vk)
+    /// <summary>Keys of a combination, as language-independent names (e.g. ["Ctrl", "S"]).</summary>
+    public static IReadOnlyList<string> Combination(bool ctrl, bool alt, bool shift, bool win, int vk)
     {
-        var parts = new List<string>(5);
-        if (ctrl) parts.Add("Ctrl");
-        if (alt) parts.Add("Alt");
-        if (shift) parts.Add("Shift");
-        if (win) parts.Add("Win");
-        parts.Add(Name(vk));
-        return string.Join("+", parts);
+        var keys = new List<string>(5);
+        if (ctrl) keys.Add("Ctrl");
+        if (alt) keys.Add("Alt");
+        if (shift) keys.Add("Shift");
+        if (win) keys.Add("Win");
+        keys.Add(Name(vk));
+        return keys;
     }
 
+    /// <summary>
+    /// Language-independent key name. The caption formatter translates it
+    /// (e.g. "Delete" is "Supr" in Spanish).
+    /// </summary>
     public static string Name(int vk) => vk switch
     {
         VK_RETURN => "Enter",
         VK_ESCAPE => "Esc",
         VK_TAB => "Tab",
-        VK_BACK => "Retroceso",
-        VK_SPACE => "Espacio",
-        VK_DELETE => "Supr",
+        VK_BACK => "Backspace",
+        VK_SPACE => "Space",
+        VK_DELETE => "Delete",
         VK_INSERT => "Insert",
-        VK_HOME => "Inicio",
-        VK_END => "Fin",
-        VK_PRIOR => "RePág",
-        VK_NEXT => "AvPág",
-        VK_LEFT => "←",
-        VK_UP => "↑",
-        VK_RIGHT => "→",
-        VK_DOWN => "↓",
-        VK_APPS => "Menú",
-        VK_PAUSE => "Pausa",
-        VK_SNAPSHOT => "ImprPant",
+        VK_HOME => "Home",
+        VK_END => "End",
+        VK_PRIOR => "PageUp",
+        VK_NEXT => "PageDown",
+        VK_LEFT => "Left",
+        VK_UP => "Up",
+        VK_RIGHT => "Right",
+        VK_DOWN => "Down",
+        VK_APPS => "Menu",
+        VK_PAUSE => "Pause",
+        VK_SNAPSHOT => "PrintScreen",
         >= VK_F1 and <= VK_F24 => $"F{vk - VK_F1 + 1}",
         >= 0x30 and <= 0x39 or >= 0x41 and <= 0x5A => ((char)vk).ToString(),
         >= VK_NUMPAD0 and <= VK_NUMPAD0 + 9 => $"Num{vk - VK_NUMPAD0}",

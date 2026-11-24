@@ -6,6 +6,7 @@ using Tec.App.Mvvm;
 using Tec.App.Services;
 using Tec.Core.Diagnostics;
 using Tec.Core.Model;
+using Tec.Core.Services.Captions;
 using Tec.Windows.Processes;
 
 namespace Tec.App.ViewModels;
@@ -25,6 +26,7 @@ public sealed class MainViewModel : ObservableObject
     private RunningSession? _session;
     private TargetProcessInfo? _selectedProcess;
     private CaptureAreaOption _selectedArea;
+    private CaptionLanguage _captionLanguage = CaptionLanguage.Spanish;
     private string _outputRoot;
     private string _status = "Selecciona la aplicación a probar y presiona Iniciar.";
     private bool _captureClicks = true;
@@ -67,6 +69,7 @@ public sealed class MainViewModel : ObservableObject
     public ObservableCollection<TargetProcessInfo> Processes { get; } = [];
     public ObservableCollection<EvidenceItem> Evidences { get; } = [];
     public IReadOnlyList<CaptureAreaOption> CaptureAreas { get; }
+    public IReadOnlyList<CaptionLanguage> CaptionLanguages { get; } = CaptionLanguage.All;
 
     public ICommand RefreshProcessesCommand { get; }
     public ICommand LaunchCommand { get; }
@@ -80,6 +83,7 @@ public sealed class MainViewModel : ObservableObject
 
     public TargetProcessInfo? SelectedProcess { get => _selectedProcess; set => SetProperty(ref _selectedProcess, value); }
     public CaptureAreaOption SelectedArea { get => _selectedArea; set => SetProperty(ref _selectedArea, value); }
+    public CaptionLanguage CaptionLanguage { get => _captionLanguage; set => SetProperty(ref _captionLanguage, value); }
     public string OutputRoot { get => _outputRoot; set => SetProperty(ref _outputRoot, value); }
     public string Status { get => _status; private set => SetProperty(ref _status, value); }
     public bool CaptureClicks { get => _captureClicks; set => SetProperty(ref _captureClicks, value); }
@@ -151,6 +155,7 @@ public sealed class MainViewModel : ObservableObject
                 Target = target,
                 OutputRoot = OutputRoot,
                 Area = SelectedArea.Value,
+                CaptionLanguage = CaptionLanguage,
                 CaptureClicks = CaptureClicks,
                 CaptureKeyboardCommands = CaptureKeyboardCommands,
                 CaptureTextInput = CaptureTextInput,

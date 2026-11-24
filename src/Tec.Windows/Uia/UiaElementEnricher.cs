@@ -23,7 +23,7 @@ public sealed class UiaElementEnricher(FocusTracker? focusTracker = null, TimeSp
 
         var task = Task.Run(() => Resolve(interaction));
         if (!task.Wait(_timeout))
-            return interaction.WithNote("La aplicación no respondió a tiempo para identificar el elemento");
+            return interaction.WithNote(InteractionNote.ElementTimeout);
 
         return task.Result is { } element ? interaction with { Element = element } : interaction;
     }

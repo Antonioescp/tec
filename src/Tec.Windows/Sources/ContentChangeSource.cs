@@ -135,13 +135,13 @@ public sealed class ContentChangeSource(
         {
             Kind = InteractionKind.ContentChanged,
             Timestamp = clock.Now,
-            Description = $"cambió el {change.ChangedFraction:P0} de la ventana",
+            ChangedFraction = change.ChangedFraction,
             WindowHandle = hwnd,
             ProcessId = Win32Window.GetProcessId(hwnd),
             HighlightBounds = change.Bounds.Offset(windowBounds.Left, windowBounds.Top),
         };
         if (!change.Settled)
-            interaction = interaction.WithNote("La pantalla seguía cambiando (animación en curso)");
+            interaction = interaction.WithNote(InteractionNote.ScreenStillChanging);
 
         InteractionDetected?.Invoke(this, interaction);
     }

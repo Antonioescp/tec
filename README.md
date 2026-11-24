@@ -14,6 +14,7 @@ se presiona **Iniciar** y TEC toma una captura por cada interacción:
 Cada imagen lleva una cabecera con el número, el tipo de interacción, el elemento, la
 hora, la ventana y la posición, y un **recuadro rojo**; si el fondo alrededor del recuadro
 es rojo (o parecido) se usa otro color que contraste (azul, magenta, verde…).
+La cabecera puede generarse en español o en inglés (opción **Idioma de las leyendas**).
 
 Por cada sesión se crea una carpeta `Documentos\TEC\Evidencias\<fecha>_<app>\` con:
 
@@ -55,7 +56,8 @@ Tec.Core      (net10.0, sin dependencias de plataforma)
                 ICaptureRegionProvider, IScreenCapturer, IHighlightColorSelector,
                 IInteractionCaptionFormatter, IFrameAnnotator, IImageEncoder, IEvidenceSink
   Services      EvidenceCollector (orquestador), InteractionSnapshotter, EvidenceComposer,
-                ContrastingHighlightColorSelector, SpanishCaptionFormatter, VisualChangeDetector, filtros
+                ContrastingHighlightColorSelector, VisualChangeDetector, filtros
+  Services/Captions  CaptionFormatter, CaptionLanguage (español, inglés)
   Reporting     ImageFileEvidenceSink, HtmlReportSink, JsonLinesEvidenceLogSink
 
 Tec.Windows   (net10.0-windows: Win32, UI Automation, GDI+)
@@ -99,7 +101,8 @@ composición/escritura en un único consumidor, así que los hooks nunca se bloq
 | Otra tecnología (WinForms, web, Java) | `IInteractionSource` y/o `IInteractionEnricher` |
 | Ajustar la sensibilidad de los cambios en pantalla | `VisualChangeOptions` (umbral, tiempo de estabilización, animaciones) |
 | Exportar a Word/PDF o subir a Jira/Azure DevOps | `IEvidenceSink` |
-| Otro idioma o formato de leyenda | `IInteractionCaptionFormatter` |
+| Otro idioma de leyenda | Un `CaptionLanguage` nuevo (ver `CaptionLanguage.English.cs`) agregado a `CaptionLanguage.All` |
+| Otro formato de leyenda | `IInteractionCaptionFormatter` |
 | Otro estilo de anotación | `IFrameAnnotator` o `AnnotationStyle` |
 | Otra regla de qué capturar | `IInteractionFilter` |
 

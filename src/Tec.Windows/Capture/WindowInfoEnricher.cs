@@ -18,7 +18,7 @@ public sealed class WindowInfoEnricher : IInteractionEnricher
         if (!Win32Window.Exists(hwnd))
         {
             return interaction.Kind == InteractionKind.WindowOpened
-                ? interaction.WithNote("La ventana se cerró antes de la captura")
+                ? interaction.WithNote(InteractionNote.WindowClosedBeforeCapture)
                 : interaction;
         }
 

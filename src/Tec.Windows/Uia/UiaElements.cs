@@ -43,7 +43,17 @@ internal static class UiaElements
             AutomationId: NullIfEmpty(current.AutomationId),
             Bounds: ToScreenRect(current.BoundingRectangle),
             Value: ReadValue(element),
-            IsPassword: current.IsPassword);
+            IsPassword: current.IsPassword,
+            ControlTypeId: ControlTypeId(current.ControlType));
+    }
+
+    /// <summary>"ControlType.Button" → "Button".</summary>
+    private static string? ControlTypeId(ControlType? type)
+    {
+        var name = type?.ProgrammaticName;
+        if (string.IsNullOrEmpty(name)) return null;
+        var dot = name.LastIndexOf('.');
+        return dot >= 0 ? name[(dot + 1)..] : name;
     }
 
     public static UiElementInfo RefreshValue(UiElementInfo info, AutomationElement element)
