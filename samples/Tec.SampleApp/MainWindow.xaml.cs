@@ -17,7 +17,7 @@ public partial class MainWindow : Window
         IsEnabled = false;
         try
         {
-            await Task.Delay(TimeSpan.FromSeconds(2)); // "proceso" largo
+            await Task.Delay(TimeSpan.FromSeconds(2)); // long-running "process"
         }
         finally
         {

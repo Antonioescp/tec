@@ -5,9 +5,9 @@ using Tec.Core.Abstractions;
 namespace Tec.Core.Diagnostics;
 
 /// <summary>
-/// Escribe los logs en un archivo de texto por día (<c>tec-AAAA-MM-DD.log</c>) y borra los
-/// que tengan más de <c>retentionDays</c> días. Cada línea se escribe y se vacía
-/// al disco de inmediato para no perder el último mensaje si la aplicación se cierra de golpe.
+/// Writes logs to one text file per day (<c>tec-YYYY-MM-DD.log</c>) and deletes files
+/// older than <c>retentionDays</c> days. Each line is written and flushed to disk
+/// immediately so the last message is not lost if the application exits abruptly.
 /// </summary>
 public sealed class FileLogWriter : ILogWriter, IDisposable
 {
@@ -31,7 +31,7 @@ public sealed class FileLogWriter : ILogWriter, IDisposable
 
     public string Directory { get; }
 
-    /// <summary>Archivo del día actual.</summary>
+    /// <summary>Current day's file.</summary>
     public string CurrentFilePath => GetFilePath(DateOnly.FromDateTime(_clock.Now.DateTime));
 
     public void Write(LogLevel level, string category, string message, Exception? exception)
@@ -48,7 +48,7 @@ public sealed class FileLogWriter : ILogWriter, IDisposable
             }
             catch
             {
-                // Disco lleno, archivo bloqueado...: se pierde el mensaje, pero no se interrumpe la app.
+                // Disk full, file locked...: the message is lost, but the app is not interrupted.
                 _stream?.Dispose();
                 _stream = null;
             }
@@ -109,7 +109,7 @@ public sealed class FileLogWriter : ILogWriter, IDisposable
             }
             catch
             {
-                // Otro proceso puede tenerlo abierto; se intentará la próxima vez.
+                // Another process may have it open; it will be retried next time.
             }
         }
     }

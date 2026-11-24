@@ -11,31 +11,31 @@ namespace Tec.Windows.Sources;
 
 public sealed record KeyboardCaptureOptions
 {
-    /// <summary>Captura atajos (Ctrl/Alt/Win + tecla), teclas de función, Enter, Esc y Supr.</summary>
+    /// <summary>Captures shortcuts (Ctrl/Alt/Win + key), function keys, Enter, Esc and Delete.</summary>
     public bool CaptureCommands { get; init; } = true;
 
-    /// <summary>Captura el texto escrito en un campo (una evidencia por "ráfaga" de escritura).</summary>
+    /// <summary>Captures text typed into a field (one piece of evidence per typing "burst").</summary>
     public bool CaptureTextInput { get; init; } = true;
 
-    /// <summary>Tiempo sin escribir tras el cual se considera terminada la ráfaga.</summary>
+    /// <summary>Time without typing after which the burst is considered finished.</summary>
     public TimeSpan TextIdleTimeout { get; init; } = TimeSpan.FromMilliseconds(1200);
 
     /// <summary>
-    /// Tiempo máximo entre las dos pulsaciones de Shift + Shift, Ctrl + Ctrl o Alt + Alt
-    /// (atajos de los IDE de JetBrains, p. ej. "Search Everywhere").
+    /// Maximum time between the two presses of Shift + Shift, Ctrl + Ctrl or Alt + Alt
+    /// (JetBrains IDE shortcuts, e.g. "Search Everywhere").
     /// </summary>
     public TimeSpan DoubleTapInterval { get; init; } = TimeSpan.FromMilliseconds(500);
 }
 
 /// <summary>
-/// Detecta comandos de teclado y escritura con un hook de teclado de bajo nivel.
-/// No reconstruye el texto tecleado: al terminar una ráfaga emite una interacción
-/// <see cref="InteractionKind.TextInput"/> y el enriquecedor lee el valor real del campo
-/// (enmascarando contraseñas).
+/// Detects keyboard commands and typing with a low-level keyboard hook.
+/// It does not rebuild the typed text: when a burst ends it emits a
+/// <see cref="InteractionKind.TextInput"/> interaction and the enricher reads the field's
+/// actual value (masking passwords).
 /// </summary>
 public sealed class KeyboardSource : MessageLoopInteractionSource
 {
-    /// <summary>Modificadores cuya doble pulsación es un comando. Win queda fuera: solo abre el menú Inicio.</summary>
+    /// <summary>Modifiers whose double tap is a command. Win is excluded: it only opens the Start menu.</summary>
     private enum TapKey { Shift, Ctrl, Alt }
 
     private readonly KeyboardCaptureOptions _options;
@@ -90,7 +90,7 @@ public sealed class KeyboardSource : MessageLoopInteractionSource
             }
             catch (Exception ex)
             {
-                // Nunca interrumpir la cadena de hooks.
+                // Never break the hook chain.
                 Log.Error(Name, "Error al procesar el evento de teclado.", ex);
             }
         }
@@ -185,7 +185,7 @@ public sealed class KeyboardSource : MessageLoopInteractionSource
         Raise(new Interaction
         {
             Kind = InteractionKind.TextInput,
-            // Momento de la última tecla: el enriquecedor busca el elemento enfocado entonces.
+            // Time of the last key: the enricher looks up the element focused at that moment.
             Timestamp = _lastTextKeyAt,
             WindowHandle = window,
             ProcessId = Win32Window.GetProcessId(window),

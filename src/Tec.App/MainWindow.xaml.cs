@@ -25,7 +25,7 @@ public partial class MainWindow : Window
 
     protected override async void OnClosing(CancelEventArgs e)
     {
-        // Si hay una sesión activa, se detiene primero para generar el reporte final.
+        // If a session is running, stop it first so the final report is written.
         if (_shutdownCompleted || !_viewModel.IsRunning)
         {
             base.OnClosing(e);

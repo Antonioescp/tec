@@ -5,12 +5,12 @@ using Tec.Core.Model;
 namespace Tec.Windows.Uia;
 
 /// <summary>
-/// Identifica el elemento de UI de la interacción con UI Automation:
-/// el que está bajo el puntero (clicks) o el que tenía el foco (teclado).
+/// Identifies the interaction's UI element with UI Automation:
+/// the one under the pointer (clicks) or the one that had focus (keyboard).
 /// </summary>
 /// <remarks>
-/// UI Automation consulta al proceso objetivo; si su hilo de UI está ocupado la llamada
-/// puede bloquearse, por eso se aplica un tiempo máximo y se continúa sin el elemento.
+/// UI Automation queries the target process; if its UI thread is busy the call can
+/// block, so a timeout is applied and processing continues without the element.
 /// </remarks>
 public sealed class UiaElementEnricher(FocusTracker? focusTracker = null, TimeSpan? timeout = null) : IInteractionEnricher
 {

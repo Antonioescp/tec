@@ -4,7 +4,7 @@ using Microsoft.Win32;
 
 namespace Tec.App.Services;
 
-/// <summary>Interacción con el usuario y el shell, separada del ViewModel para poder sustituirla.</summary>
+/// <summary>User and shell interaction, kept out of the ViewModel so it can be replaced.</summary>
 public interface IUserDialogs
 {
     string? PickFolder(string initialDirectory);

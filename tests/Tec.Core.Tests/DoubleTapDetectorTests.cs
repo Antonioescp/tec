@@ -66,7 +66,7 @@ public sealed class DoubleTapDetectorTests
     public void Another_key_in_between_cancels_the_sequence()
     {
         Tap(Key.Shift, 0, 50);
-        _detector.KeyDown(null, Ms(80)); // p. ej. una letra
+        _detector.KeyDown(null, Ms(80)); // e.g. a letter
         Assert.False(Tap(Key.Shift, 100, 150));
     }
 

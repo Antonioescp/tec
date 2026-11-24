@@ -7,13 +7,13 @@ using Tec.Core.Model;
 namespace Tec.Core.Services;
 
 /// <summary>
-/// Orquestador: escucha las fuentes, toma una captura por cada interacción aceptada
-/// por el filtro, compone la evidencia y la entrega a los destinos.
+/// Orchestrator: listens to the sources, takes a capture for each interaction accepted
+/// by the filter, composes the evidence and hands it to the sinks.
 /// </summary>
 /// <remarks>
-/// Las capturas se toman en paralelo a la detección (respetando el retraso de cada
-/// interacción) pero serializadas entre sí; la composición y escritura se hacen en un
-/// único consumidor para no bloquear la captura.
+/// Captures run in parallel with detection (honoring each interaction's delay) but
+/// serialized with each other; composing and writing happen in a single consumer so
+/// capturing is never blocked.
 /// </remarks>
 public sealed class EvidenceCollector : IAsyncDisposable
 {
@@ -123,7 +123,7 @@ public sealed class EvidenceCollector : IAsyncDisposable
 
     private void OnInteractionDetected(object? sender, Interaction interaction)
     {
-        // Puede ejecutarse dentro de un hook del sistema: trabajo mínimo y nada bloqueante.
+        // May run inside a system hook: minimal work and nothing blocking.
         if (!_running || !_filter.ShouldCapture(interaction)) return;
 
         var sequence = Interlocked.Increment(ref _sequence);

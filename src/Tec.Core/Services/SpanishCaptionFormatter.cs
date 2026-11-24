@@ -4,7 +4,7 @@ using Tec.Core.Model;
 
 namespace Tec.Core.Services;
 
-/// <summary>Leyendas en español, p. ej. <c>#003 · Click izquierdo: botón "Procesar"</c>.</summary>
+/// <summary>Spanish captions, e.g. <c>#003 · Click izquierdo: botón "Procesar"</c>.</summary>
 public sealed class SpanishCaptionFormatter : IInteractionCaptionFormatter
 {
     private const int MaxValueLength = 120;

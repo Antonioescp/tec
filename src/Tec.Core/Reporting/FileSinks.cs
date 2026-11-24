@@ -6,14 +6,14 @@ using Tec.Core.Model;
 
 namespace Tec.Core.Reporting;
 
-/// <summary>Nombres del tipo <c>001_click.png</c>.</summary>
+/// <summary>Names like <c>001_click.png</c>.</summary>
 public sealed class SequentialEvidenceFileNamer(string fileExtension) : IEvidenceFileNamer
 {
     public string GetImageFileName(Evidence evidence) =>
         $"{evidence.Sequence:000}_{evidence.Interaction.Kind.Code}{fileExtension}";
 }
 
-/// <summary>Guarda la imagen anotada de cada evidencia en la carpeta de la sesión.</summary>
+/// <summary>Saves each evidence's annotated image in the session folder.</summary>
 public sealed class ImageFileEvidenceSink(IImageEncoder encoder, IEvidenceFileNamer namer) : IEvidenceSink
 {
     public Task OnSessionStartedAsync(EvidenceSession session, CancellationToken cancellationToken)
@@ -33,8 +33,8 @@ public sealed class ImageFileEvidenceSink(IImageEncoder encoder, IEvidenceFileNa
     public Task OnSessionCompletedAsync(EvidenceSession session, CancellationToken cancellationToken) => Task.CompletedTask;
 }
 
-/// <summary>Bitácora de metadatos en formato JSON Lines (<c>evidencias.jsonl</c>).</summary>
-[SuppressMessage("Reliability", "CA1001", Justification = "El SemaphoreSlim no usa AvailableWaitHandle, así que no retiene recursos nativos.")]
+/// <summary>Metadata log in JSON Lines format (<c>evidencias.jsonl</c>).</summary>
+[SuppressMessage("Reliability", "CA1001", Justification = "SemaphoreSlim does not use AvailableWaitHandle, so it holds no native resources.")]
 public sealed class JsonLinesEvidenceLogSink(IEvidenceFileNamer namer) : IEvidenceSink
 {
     public const string FileName = "evidencias.jsonl";

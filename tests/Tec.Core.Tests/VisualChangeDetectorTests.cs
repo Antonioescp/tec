@@ -60,7 +60,7 @@ public class VisualChangeDetectorTests
     [Fact]
     public void Continuous_animation_does_not_produce_repeated_evidence()
     {
-        // Aparece un overlay con un "spinner" grande que cambia en cada captura.
+        // An overlay appears with a large "spinner" that changes on every capture.
         var before = Frame();
         var frames = new List<RasterImage> { before };
         for (var i = 0; i < 24; i++)

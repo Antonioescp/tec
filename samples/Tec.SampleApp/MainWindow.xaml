@@ -26,7 +26,7 @@
 
         <ListBox x:Name="DataList" AutomationProperties.Name="Datos" Height="90" Margin="0,12,0,0" Visibility="Collapsed" />
 
-        <!-- Fondo rojo para comprobar que TEC cambia el color del recuadro. -->
+        <!-- Red background to check that TEC changes the highlight color. -->
         <Border Background="#D00000" Padding="16" Margin="0,16,0,0" CornerRadius="4">
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="Zona roja" Foreground="White" VerticalAlignment="Center" Margin="0,0,12,0" />
@@ -37,7 +37,7 @@
         <TextBlock x:Name="StatusText" Margin="0,16,0,0" Foreground="#555" />
     </StackPanel>
 
-    <!-- Overlay de carga dentro de la misma ventana (no es una ventana nueva). -->
+    <!-- Loading overlay inside the same window (not a new window). -->
     <Grid x:Name="LoadingOverlay" Background="#B0000000" Visibility="Collapsed">
         <Border Background="White" CornerRadius="6" Padding="24,16" HorizontalAlignment="Center" VerticalAlignment="Center">
             <StackPanel>

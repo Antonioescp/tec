@@ -5,30 +5,30 @@ namespace Tec.Core.Services;
 
 public sealed record HighlightColorOptions
 {
-    /// <summary>Color usado siempre que contraste con el fondo.</summary>
+    /// <summary>Color used whenever it contrasts with the background.</summary>
     public RgbColor Preferred { get; init; } = RgbColor.Red;
 
-    /// <summary>Colores alternativos, en orden de preferencia.</summary>
+    /// <summary>Fallback colors, in order of preference.</summary>
     public IReadOnlyList<RgbColor> Alternatives { get; init; } =
         [RgbColor.Blue, RgbColor.Magenta, RgbColor.Lime, RgbColor.Yellow, RgbColor.Cyan];
 
-    /// <summary>Distancia por debajo de la cual un píxel se considera "parecido" a un color.</summary>
+    /// <summary>Distance below which a pixel is considered "similar" to a color.</summary>
     public double SimilarityThreshold { get; init; } = 150;
 
-    /// <summary>Fracción máxima de píxeles parecidos tolerada para usar el color preferido.</summary>
+    /// <summary>Maximum fraction of similar pixels tolerated to use the preferred color.</summary>
     public double MaxSimilarFraction { get; init; } = 0.15;
 
-    /// <summary>Grosor (px) de la franja muestreada alrededor del borde del resaltado.</summary>
+    /// <summary>Width (px) of the band sampled around the highlight border.</summary>
     public int SampleBand { get; init; } = 6;
 
-    /// <summary>Distancia entre muestras (px).</summary>
+    /// <summary>Distance between samples (px).</summary>
     public int SampleStep { get; init; } = 2;
 }
 
 /// <summary>
-/// Muestrea los píxeles alrededor del borde del resaltado (donde se dibuja el recuadro)
-/// y usa el color preferido (rojo) salvo que el fondo se le parezca; en ese caso elige
-/// la alternativa que menos se confunda con el fondo.
+/// Samples the pixels around the highlight border (where the box is drawn) and uses
+/// the preferred color (red) unless the background resembles it; in that case it picks
+/// the fallback least likely to blend with the background.
 /// </summary>
 public sealed class ContrastingHighlightColorSelector(HighlightColorOptions? options = null) : IHighlightColorSelector
 {
@@ -46,7 +46,7 @@ public sealed class ContrastingHighlightColorSelector(HighlightColorOptions? opt
             .Select(color => (color, similar: SimilarFraction(samples, color)))
             .ToList();
 
-        // La primera alternativa aceptable respeta el orden de preferencia configurado.
+        // The first acceptable fallback honors the configured order of preference.
         foreach (var (color, similar) in scored)
             if (similar <= _options.MaxSimilarFraction) return color;
 
@@ -77,7 +77,7 @@ public sealed class ContrastingHighlightColorSelector(HighlightColorOptions? opt
             {
                 if (rowInsideInner && x >= inner.Left && x < inner.Right)
                 {
-                    // Saltar el interior del anillo hasta la primera muestra a la derecha.
+                    // Skip the inside of the ring up to the first sample on the right.
                     var next = outer.Left + (int)Math.Ceiling((inner.Right - outer.Left) / (double)step) * step;
                     x = next - step;
                     continue;

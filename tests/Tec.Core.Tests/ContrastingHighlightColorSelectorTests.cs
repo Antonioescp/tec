@@ -37,7 +37,7 @@ public class ContrastingHighlightColorSelectorTests
         var options = new HighlightColorOptions { Alternatives = [RgbColor.Blue, RgbColor.Lime] };
         var selector = new ContrastingHighlightColorSelector(options);
 
-        // Fondo rojo dentro del anillo y azul fuera: el azul también se confunde, debe elegir verde.
+        // Red background inside the ring and blue outside: blue also blends in, so it must pick green.
         var pixels = RasterImage.Solid(FrameBounds.Width, FrameBounds.Height, RgbColor.Red);
         var frame = new CapturedFrame(FrameBounds, pixels);
         PaintOutside(frame, Highlight, RgbColor.Blue);

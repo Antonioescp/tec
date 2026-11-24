@@ -4,8 +4,8 @@ using static Tec.Windows.Native.NativeMethods;
 namespace Tec.Windows.Native;
 
 /// <summary>
-/// Hilo dedicado con bucle de mensajes Win32. Los hooks de bajo nivel y los WinEvent
-/// hooks se ejecutan en el hilo que los instala, que debe procesar mensajes.
+/// Dedicated thread with a Win32 message loop. Low-level hooks and WinEvent hooks
+/// run on the thread that installs them, which must pump messages.
 /// </summary>
 internal sealed class MessageLoopThread(string name, Action install, Action uninstall) : IDisposable
 {
@@ -24,7 +24,7 @@ internal sealed class MessageLoopThread(string name, Action install, Action unin
         var thread = new Thread(() =>
         {
             _threadId = GetCurrentThreadId();
-            PeekMessage(out _, 0, 0, 0, PM_NOREMOVE); // fuerza la creación de la cola de mensajes
+            PeekMessage(out _, 0, 0, 0, PM_NOREMOVE); // forces the message queue to be created
 
             try
             {

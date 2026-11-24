@@ -3,7 +3,7 @@ using Tec.Core.Model;
 
 namespace Tec.Windows.Uia;
 
-/// <summary>Utilidades de UI Automation compartidas.</summary>
+/// <summary>Shared UI Automation helpers.</summary>
 internal static class UiaElements
 {
     private const int MaxValueLength = 500;
@@ -17,8 +17,8 @@ internal static class UiaElements
     ];
 
     /// <summary>
-    /// Si el elemento es un texto o imagen dentro de un control (p. ej. el TextBlock de un
-    /// botón) devuelve el control interactivo que lo contiene.
+    /// If the element is text or an image inside a control (e.g. a button's TextBlock),
+    /// returns the interactive control that contains it.
     /// </summary>
     public static AutomationElement PromoteToInteractive(AutomationElement element, int maxLevels = 5)
     {

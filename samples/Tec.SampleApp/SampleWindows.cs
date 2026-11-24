@@ -4,7 +4,7 @@ using System.Windows.Media;
 
 namespace Tec.SampleApp;
 
-/// <summary>Ventana "espere" sin bordes y transparente (ventana en capas).</summary>
+/// <summary>Borderless, transparent "please wait" window (layered window).</summary>
 public sealed class WaitWindow : Window
 {
     public WaitWindow()

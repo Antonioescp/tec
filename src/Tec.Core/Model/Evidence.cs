@@ -1,12 +1,12 @@
 namespace Tec.Core.Model;
 
-/// <summary>Texto que acompaña a una evidencia.</summary>
+/// <summary>Text that accompanies a piece of evidence.</summary>
 public sealed record InteractionCaption(string Title, string Details);
 
-/// <summary>Captura de pantalla tomada para una interacción, antes de anotarse.</summary>
+/// <summary>Screenshot taken for an interaction, before annotation.</summary>
 public sealed record InteractionSnapshot(Interaction Interaction, CapturedFrame Frame, DateTimeOffset CapturedAt);
 
-/// <summary>Evidencia final: imagen anotada más los metadatos de la interacción.</summary>
+/// <summary>Final evidence: annotated image plus the interaction metadata.</summary>
 public sealed record Evidence(
     int Sequence,
     Interaction Interaction,
@@ -16,7 +16,7 @@ public sealed record Evidence(
     RasterImage Image,
     DateTimeOffset CapturedAt);
 
-/// <summary>Sesión de recolección de evidencia.</summary>
+/// <summary>Evidence collection session.</summary>
 public sealed record EvidenceSession(
     string Id,
     string TargetDescription,
@@ -39,7 +39,7 @@ public sealed record EvidenceSession(
     }
 }
 
-/// <summary>Proceso candidato a ser observado.</summary>
+/// <summary>Process that can be observed.</summary>
 public sealed record TargetProcessInfo(int ProcessId, string ProcessName, string MainWindowTitle)
 {
     public override string ToString() =>

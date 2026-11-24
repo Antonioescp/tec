@@ -9,12 +9,12 @@ using Tec.Windows.Processes;
 
 namespace Tec.App;
 
-[SuppressMessage("Reliability", "CA1001", Justification = "WPF no desecha Application; el log se cierra en OnExit.")]
+[SuppressMessage("Reliability", "CA1001", Justification = "WPF does not dispose Application; the log is closed in OnExit.")]
 public partial class App : Application
 {
     private const string Category = "App";
 
-    /// <summary>Carpeta de los logs: %LOCALAPPDATA%\TEC\logs.</summary>
+    /// <summary>Log folder: %LOCALAPPDATA%\TEC\logs.</summary>
     public static string LogDirectory { get; } = System.IO.Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "TEC", "logs");
 
@@ -47,7 +47,7 @@ public partial class App : Application
         }
         catch (Exception ex)
         {
-            // Sin logs la app sigue funcionando.
+            // The app keeps working without logs.
             System.Diagnostics.Debug.WriteLine($"No se pudo configurar el log: {ex}");
         }
 
@@ -72,7 +72,7 @@ public partial class App : Application
         MessageBox.Show(
             $"Ocurrió un error inesperado.\n\n{e.Exception.Message}\n\nDetalle en el log: {LogDirectory}",
             "TEC", MessageBoxButton.OK, MessageBoxImage.Error);
-        e.Handled = true; // la app sigue abierta para no perder la sesión en curso
+        e.Handled = true; // keep the app open so the current session is not lost
     }
 
     private static bool IsAdministrator()

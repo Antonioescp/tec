@@ -1,9 +1,9 @@
 namespace Tec.Core.Model;
 
-/// <summary>Punto en coordenadas físicas de pantalla (píxeles del escritorio virtual).</summary>
+/// <summary>Point in physical screen coordinates (virtual desktop pixels).</summary>
 public readonly record struct ScreenPoint(int X, int Y);
 
-/// <summary>Rectángulo en coordenadas físicas de pantalla.</summary>
+/// <summary>Rectangle in physical screen coordinates.</summary>
 public readonly record struct ScreenRect(int Left, int Top, int Width, int Height)
 {
     public static ScreenRect Empty { get; } = new(0, 0, 0, 0);

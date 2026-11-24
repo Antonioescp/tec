@@ -8,16 +8,16 @@ public enum LogLevel
     Error,
 }
 
-/// <summary>Destino de los mensajes de diagnóstico. Una implementación nunca debe lanzar excepciones.</summary>
+/// <summary>Destination of diagnostic messages. Implementations must never throw.</summary>
 public interface ILogWriter
 {
     void Write(LogLevel level, string category, string message, Exception? exception);
 }
 
 /// <summary>
-/// Punto de acceso a los logs de diagnóstico. Es un punto de acceso global para no tener
-/// que pasar un logger a cada fuente, enriquecedor o hook nativo; por defecto no escribe
-/// nada y el composition root (Tec.App) configura el destino real.
+/// Entry point for diagnostic logging. It is global so a logger does not have to be
+/// passed to every source, enricher or native hook; by default it writes nothing and
+/// the composition root (Tec.App) configures the real destination.
 /// </summary>
 public static class Log
 {
@@ -43,7 +43,7 @@ public static class Log
         }
         catch
         {
-            // Registrar un error nunca debe provocar otro.
+            // Logging an error must never cause another one.
         }
     }
 

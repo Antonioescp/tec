@@ -12,7 +12,7 @@ public readonly record struct RgbColor(byte R, byte G, byte B)
     public static RgbColor White { get; } = new(255, 255, 255);
 
     /// <summary>
-    /// Distancia perceptual aproximada ("redmean"). 0 = idénticos, ~765 = máximo.
+    /// Approximate perceptual distance ("redmean"). 0 = identical, ~765 = maximum.
     /// </summary>
     public double DistanceTo(RgbColor other)
     {

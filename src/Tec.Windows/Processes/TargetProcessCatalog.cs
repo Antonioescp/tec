@@ -9,7 +9,7 @@ public interface ITargetProcessCatalog
     TargetProcessInfo Launch(string executablePath, TimeSpan waitForWindow);
 }
 
-/// <summary>Procesos con ventana principal, excluyendo al propio TEC.</summary>
+/// <summary>Processes with a main window, excluding TEC itself.</summary>
 public sealed class TargetProcessCatalog : ITargetProcessCatalog
 {
     public IReadOnlyList<TargetProcessInfo> GetCandidates()
@@ -27,7 +27,7 @@ public sealed class TargetProcessCatalog : ITargetProcessCatalog
                 }
                 catch (InvalidOperationException)
                 {
-                    // El proceso terminó mientras se enumeraba.
+                    // The process exited while being enumerated.
                 }
             }
         }

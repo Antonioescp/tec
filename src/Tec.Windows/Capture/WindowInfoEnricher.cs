@@ -5,8 +5,8 @@ using Tec.Windows.Native;
 namespace Tec.Windows.Capture;
 
 /// <summary>
-/// Completa el título de la ventana y, para ventanas mostradas, usa sus límites
-/// actuales (ya dibujada) como región a resaltar.
+/// Fills in the window title and, for shown windows, uses their current bounds
+/// (once painted) as the region to highlight.
 /// </summary>
 public sealed class WindowInfoEnricher : IInteractionEnricher
 {

@@ -9,7 +9,7 @@ public sealed class SystemClock : IClock
     public DateTimeOffset Now => DateTimeOffset.Now;
 }
 
-/// <summary>Acepta solo interacciones de los procesos indicados.</summary>
+/// <summary>Accepts only interactions from the given processes.</summary>
 public sealed class ProcessInteractionFilter(IEnumerable<int> processIds) : IInteractionFilter
 {
     private readonly HashSet<int> _processIds = [.. processIds];
@@ -18,7 +18,7 @@ public sealed class ProcessInteractionFilter(IEnumerable<int> processIds) : IInt
         interaction.ProcessId is { } pid && _processIds.Contains(pid);
 }
 
-/// <summary>Acepta solo interacciones cuyo tipo está habilitado.</summary>
+/// <summary>Accepts only interactions whose kind is enabled.</summary>
 public sealed class KindInteractionFilter(IEnumerable<InteractionKind> enabledKinds) : IInteractionFilter
 {
     private readonly HashSet<InteractionKind> _kinds = [.. enabledKinds];
@@ -26,7 +26,7 @@ public sealed class KindInteractionFilter(IEnumerable<InteractionKind> enabledKi
     public bool ShouldCapture(Interaction interaction) => _kinds.Contains(interaction.Kind);
 }
 
-/// <summary>Acepta una interacción solo si todos los filtros la aceptan.</summary>
+/// <summary>Accepts an interaction only if every filter accepts it.</summary>
 public sealed class AllInteractionFilters(IEnumerable<IInteractionFilter> filters) : IInteractionFilter
 {
     private readonly IReadOnlyList<IInteractionFilter> _filters = [.. filters];

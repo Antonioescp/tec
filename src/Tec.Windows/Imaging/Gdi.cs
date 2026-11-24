@@ -46,7 +46,7 @@ internal static class BitmapConversions
     }
 }
 
-/// <summary>Captura de pantalla con GDI (incluye ventanas en capas/transparentes).</summary>
+/// <summary>Screen capture with GDI (includes layered/transparent windows).</summary>
 public sealed class GdiScreenCapturer : IScreenCapturer
 {
     public CapturedFrame Capture(ScreenRect region)
@@ -56,8 +56,8 @@ public sealed class GdiScreenCapturer : IScreenCapturer
         using var bitmap = new Bitmap(region.Width, region.Height, PixelFormat.Format32bppRgb);
         using (var graphics = Graphics.FromImage(bitmap))
         {
-            // Graphics.CopyFromScreen rechaza SourceCopy | CaptureBlt (valida el enum como valor único),
-            // así que se llama a BitBlt directamente. CAPTUREBLT incluye las ventanas en capas.
+            // Graphics.CopyFromScreen rejects SourceCopy | CaptureBlt (it validates the enum as a single value),
+            // so BitBlt is called directly. CAPTUREBLT includes layered windows.
             var screenDc = NativeMethods.GetDC(0);
             if (screenDc == 0) throw new InvalidOperationException("No se pudo obtener el contexto de dispositivo de la pantalla.");
             var bitmapDc = graphics.GetHdc();

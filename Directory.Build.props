@@ -7,14 +7,14 @@
     <Product>TEC - Test Evidence Collector</Product>
   </PropertyGroup>
 
-  <!-- Análisis de código: reglas de calidad (CA) y de estilo (.editorconfig, IDE) al compilar. -->
+  <!-- Code analysis: quality (CA) and style (.editorconfig, IDE) rules at build time. -->
   <PropertyGroup>
     <AnalysisLevel>latest-recommended</AnalysisLevel>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <!-- Necesario para que IDE0005 (using innecesario) se reporte al compilar. -->
+    <!-- Required for IDE0005 (unnecessary using) to be reported at build time. -->
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <!-- CS1591: no se exige comentario XML en cada miembro público. -->
+    <!-- CS1591: XML comments are not required on every public member. -->
     <NoWarn>$(NoWarn);CS1591</NoWarn>
   </PropertyGroup>
 </Project>

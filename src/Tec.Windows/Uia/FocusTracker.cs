@@ -4,9 +4,8 @@ using Tec.Core.Abstractions;
 namespace Tec.Windows.Uia;
 
 /// <summary>
-/// Registra el historial reciente de foco de UI Automation para saber qué elemento
-/// tenía el foco en el instante de una interacción de teclado, aunque el foco haya
-/// cambiado antes de que se procese.
+/// Records recent UI Automation focus history to know which element had focus at the
+/// moment of a keyboard interaction, even if focus changed before it is processed.
 /// </summary>
 public sealed class FocusTracker : IDisposable
 {
@@ -26,7 +25,7 @@ public sealed class FocusTracker : IDisposable
     {
         if (_handler is not null) return;
         _handler = OnFocusChanged;
-        // Registrar/quitar manejadores de UIA fuera del hilo de UI evita bloqueos.
+        // Adding/removing UIA handlers off the UI thread avoids deadlocks.
         Task.Run(() => Automation.AddAutomationFocusChangedEventHandler(_handler)).Wait();
     }
 
@@ -35,11 +34,11 @@ public sealed class FocusTracker : IDisposable
         if (_handler is null) return;
         var handler = _handler;
         try { Task.Run(() => Automation.RemoveAutomationFocusChangedEventHandler(handler)).Wait(TimeSpan.FromSeconds(3)); }
-        catch { /* el proceso puede estar cerrándose */ }
+        catch { /* the process may be shutting down */ }
         _handler = null;
     }
 
-    /// <summary>Elemento enfocado en <paramref name="at"/> (o el último conocido antes de ese instante).</summary>
+    /// <summary>Element focused at <paramref name="at"/> (or the last one known before that moment).</summary>
     public AutomationElement? GetFocusedAt(DateTimeOffset at)
     {
         lock (_lock)

@@ -1,14 +1,14 @@
 namespace Tec.Core.Services;
 
 /// <summary>
-/// Detecta la doble pulsación de una tecla que por sí sola no es un comando
-/// (p. ej. Shift + Shift o Ctrl + Ctrl en los IDE de JetBrains).
+/// Detects a double tap of a key that is not a command on its own
+/// (e.g. Shift + Shift or Ctrl + Ctrl in JetBrains IDEs).
 /// </summary>
 /// <remarks>
-/// Cuenta como "toque" presionar y soltar la tecla sin pulsar ninguna otra en medio y sin
-/// mantenerla más de <c>maxInterval</c>. Dos toques de la misma tecla con a lo más
-/// <c>maxInterval</c> entre ambas liberaciones forman una doble pulsación. Cualquier otra
-/// tecla (incluida una combinación como Ctrl + Shift) cancela la secuencia.
+/// A "tap" is pressing and releasing the key with no other key in between and without
+/// holding it longer than <c>maxInterval</c>. Two taps of the same key with at most
+/// <c>maxInterval</c> between both releases form a double tap. Any other key
+/// (including a combination such as Ctrl + Shift) cancels the sequence.
 /// </remarks>
 public sealed class DoubleTapDetector<TKey>(TimeSpan maxInterval) where TKey : struct
 {
@@ -17,8 +17,8 @@ public sealed class DoubleTapDetector<TKey>(TimeSpan maxInterval) where TKey : s
     private TKey? _lastTap;
     private DateTimeOffset _lastTapAt;
 
-    /// <param name="tapKey">La tecla si puede formar una doble pulsación; <c>null</c> para cualquier otra.</param>
-    /// <param name="at">Momento en que se presionó la tecla.</param>
+    /// <param name="tapKey">The key if it can form a double tap; <c>null</c> for any other key.</param>
+    /// <param name="at">When the key was pressed.</param>
     public void KeyDown(TKey? tapKey, DateTimeOffset at)
     {
         if (tapKey is not { } key)
@@ -29,10 +29,10 @@ public sealed class DoubleTapDetector<TKey>(TimeSpan maxInterval) where TKey : s
 
         if (_held is { } held)
         {
-            // Repetición automática de la tecla mantenida: se ignora.
+            // Auto-repeat of the held key: ignored.
             if (Same(held, key)) return;
 
-            // Dos teclas a la vez (Ctrl + Shift): es una combinación, no un toque.
+            // Two keys at once (Ctrl + Shift): a combination, not a tap.
             Reset();
             return;
         }
@@ -41,7 +41,7 @@ public sealed class DoubleTapDetector<TKey>(TimeSpan maxInterval) where TKey : s
         _heldSince = at;
     }
 
-    /// <returns><c>true</c> si esta liberación completa una doble pulsación.</returns>
+    /// <returns><c>true</c> if this release completes a double tap.</returns>
     public bool KeyUp(TKey? tapKey, DateTimeOffset at)
     {
         if (tapKey is not { } key) return false;
@@ -55,7 +55,7 @@ public sealed class DoubleTapDetector<TKey>(TimeSpan maxInterval) where TKey : s
         _held = null;
         if (at - _heldSince > maxInterval)
         {
-            _lastTap = null; // se mantuvo presionada: no es un toque
+            _lastTap = null; // held too long: not a tap
             return false;
         }
 

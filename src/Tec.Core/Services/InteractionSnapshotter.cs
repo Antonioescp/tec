@@ -5,8 +5,8 @@ using Tec.Core.Model;
 namespace Tec.Core.Services;
 
 /// <summary>
-/// Captura primero la pantalla (para reflejar el estado en el instante de la interacción)
-/// y después completa la interacción con los enriquecedores.
+/// Captures the screen first (to reflect the state at the moment of the interaction)
+/// and then completes the interaction with the enrichers.
 /// </summary>
 public sealed class InteractionSnapshotter(
     ICaptureRegionProvider regionProvider,

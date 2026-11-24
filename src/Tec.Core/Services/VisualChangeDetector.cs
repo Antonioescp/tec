@@ -5,54 +5,54 @@ namespace Tec.Core.Services;
 
 public sealed record VisualChangeOptions
 {
-    /// <summary>Tamaño (px) de los bloques en que se divide la imagen para compararla.</summary>
+    /// <summary>Size (px) of the blocks the image is split into for comparison.</summary>
     public int BlockSize { get; init; } = 24;
 
-    /// <summary>Se compara un píxel de cada <c>SampleStep</c> en cada eje.</summary>
+    /// <summary>One pixel out of every <c>SampleStep</c> is compared on each axis.</summary>
     public int SampleStep { get; init; } = 2;
 
-    /// <summary>Diferencia de luminancia (0-255) a partir de la cual un píxel cambió.</summary>
+    /// <summary>Luminance difference (0-255) from which a pixel counts as changed.</summary>
     public int PixelThreshold { get; init; } = 24;
 
-    /// <summary>Píxeles muestreados que deben cambiar para considerar que un bloque cambió.</summary>
+    /// <summary>Sampled pixels that must change for a block to count as changed.</summary>
     public int MinChangedPixelsPerBlock { get; init; } = 3;
 
-    /// <summary>Fracción mínima de bloques cambiados para considerar el cambio relevante.</summary>
+    /// <summary>Minimum fraction of changed blocks for the change to be relevant.</summary>
     public double MinChangedFraction { get; init; } = 0.02;
 
-    /// <summary>Cantidad mínima de bloques cambiados (para ventanas pequeñas).</summary>
+    /// <summary>Minimum number of changed blocks (for small windows).</summary>
     public int MinChangedBlocks { get; init; } = 6;
 
-    /// <summary>Tiempo sin cambios tras el cual la pantalla se considera estable.</summary>
+    /// <summary>Time without changes after which the screen is considered stable.</summary>
     public TimeSpan SettleTime { get; init; } = TimeSpan.FromMilliseconds(350);
 
-    /// <summary>Tiempo máximo de espera a que la pantalla se estabilice (p. ej. con animaciones).</summary>
+    /// <summary>Maximum wait for the screen to settle (e.g. with animations).</summary>
     public TimeSpan MaxWait { get; init; } = TimeSpan.FromSeconds(2);
 
-    /// <summary>Cantidad de comparaciones recientes que se recuerdan por bloque.</summary>
+    /// <summary>Number of recent comparisons remembered per block.</summary>
     public int AnimationWindow { get; init; } = 4;
 
-    /// <summary>Un bloque que cambió en al menos esta cantidad de las comparaciones recientes es una animación.</summary>
+    /// <summary>A block that changed in at least this many recent comparisons is an animation.</summary>
     public int AnimationHits { get; init; } = 2;
 }
 
-/// <param name="Bounds">Región cambiada, en coordenadas de la imagen.</param>
-/// <param name="ChangedFraction">Fracción de la imagen que cambió (0-1).</param>
-/// <param name="Settled">Falso si se emitió por tiempo máximo mientras la pantalla seguía cambiando.</param>
+/// <param name="Bounds">Changed region, in image coordinates.</param>
+/// <param name="ChangedFraction">Fraction of the image that changed (0-1).</param>
+/// <param name="Settled">False if emitted on timeout while the screen was still changing.</param>
 public sealed record VisualChange(ScreenRect Bounds, double ChangedFraction, bool Settled);
 
 /// <summary>
-/// Detecta cambios visuales relevantes entre capturas sucesivas de una ventana
-/// (overlays de "cargando", paneles que aparecen, resultados que se muestran).
+/// Detects relevant visual changes between successive captures of a window
+/// ("loading" overlays, panels that appear, results that are shown).
 /// </summary>
 /// <remarks>
 /// <list type="bullet">
-/// <item>Los cambios pequeños (cursor de texto, escritura, hover) se absorben sin emitir.</item>
-/// <item>Ante un cambio relevante espera a que la pantalla se estabilice y lo emite una sola vez.</item>
-/// <item>Los bloques que cambian continuamente (spinners, barras de progreso) se tratan como
-/// animaciones: no impiden la estabilización ni disparan evidencias nuevas.</item>
+/// <item>Small changes (text caret, typing, hover) are absorbed without emitting.</item>
+/// <item>On a relevant change it waits for the screen to settle and emits it once.</item>
+/// <item>Blocks that change continuously (spinners, progress bars) are treated as
+/// animations: they neither prevent settling nor trigger new evidence.</item>
 /// </list>
-/// No es seguro para uso concurrente: una instancia por ventana observada.
+/// Not thread-safe: one instance per observed window.
 /// </remarks>
 public sealed class VisualChangeDetector(VisualChangeOptions? options = null)
 {
@@ -72,7 +72,7 @@ public sealed class VisualChangeDetector(VisualChangeOptions? options = null)
         _changing = false;
     }
 
-    /// <summary>Procesa una captura nueva; devuelve el cambio cuando se completa uno relevante.</summary>
+    /// <summary>Processes a new capture; returns the change when a relevant one completes.</summary>
     public VisualChange? Process(RasterImage frame, DateTimeOffset at)
     {
         if (_reference is null || frame.Width != _width || frame.Height != _height)
@@ -98,7 +98,7 @@ public sealed class VisualChangeDetector(VisualChangeOptions? options = null)
             }
             else
             {
-                _reference = luminance; // absorber cambios pequeños y animaciones
+                _reference = luminance; // absorb small changes and animations
             }
             return null;
         }
@@ -111,7 +111,7 @@ public sealed class VisualChangeDetector(VisualChangeOptions? options = null)
         _changing = false;
         _reference = luminance;
 
-        if (!IsSignificant(fromReference, excludeAnimated: false)) return null; // volvió a como estaba
+        if (!IsSignificant(fromReference, excludeAnimated: false)) return null; // back to how it was
 
         var useStatic = IsSignificant(fromReference, excludeAnimated: true);
         return new VisualChange(

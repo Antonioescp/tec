@@ -7,13 +7,13 @@ using Tec.Windows.Native;
 
 namespace Tec.Windows.Sources;
 
-/// <summary>Decide qué ventana se observa en cada momento (0 = ninguna).</summary>
+/// <summary>Decides which window is observed at each moment (0 = none).</summary>
 public interface IWatchedWindowProvider
 {
     nint GetWatchedWindow();
 }
 
-/// <summary>Observa la ventana activa solo si pertenece a uno de los procesos objetivo.</summary>
+/// <summary>Observes the active window only if it belongs to one of the target processes.</summary>
 public sealed class TargetForegroundWindowProvider(IEnumerable<int> processIds) : IWatchedWindowProvider
 {
     private readonly HashSet<int> _processIds = [.. processIds];
@@ -27,21 +27,21 @@ public sealed class TargetForegroundWindowProvider(IEnumerable<int> processIds) 
 
 public sealed record ContentChangeOptions
 {
-    /// <summary>Frecuencia con que se compara la ventana.</summary>
+    /// <summary>How often the window is compared.</summary>
     public TimeSpan PollInterval { get; init; } = TimeSpan.FromMilliseconds(250);
 
     public VisualChangeOptions Detection { get; init; } = new();
 }
 
 /// <summary>
-/// Detecta cambios visuales dentro de una ventana que no abren ventanas nuevas:
-/// overlays de "cargando", paneles que aparecen, pestañas o resultados que se muestran.
+/// Detects visual changes inside a window that do not open new windows:
+/// "loading" overlays, panels that appear, tabs or results that are shown.
 /// </summary>
 /// <remarks>
-/// Compara periódicamente el contenido de la ventana activa del proceso objetivo, por lo
-/// que funciona con cualquier tecnología de UI. Mantiene un detector por ventana: al volver
-/// a una ventana (p. ej. al cerrar un diálogo) se detectan los cambios ocurridos mientras
-/// estaba en segundo plano.
+/// Periodically compares the content of the target process's active window, so it works
+/// with any UI technology. It keeps one detector per window: when returning to a window
+/// (e.g. after closing a dialog) the changes made while it was in the background are
+/// detected.
 /// </remarks>
 public sealed class ContentChangeSource(
     IClock clock,
@@ -71,7 +71,7 @@ public sealed class ContentChangeSource(
         if (_loop is null) return;
         _cts!.Cancel();
         try { _loop.Wait(TimeSpan.FromSeconds(2)); }
-        catch (AggregateException) { /* cancelado */ }
+        catch (AggregateException) { /* canceled */ }
         _cts.Dispose();
         _cts = null;
         _loop = null;
@@ -94,8 +94,8 @@ public sealed class ContentChangeSource(
                 }
                 catch (Exception ex)
                 {
-                    // Un fallo puntual de captura no debe detener la observación.
-                    // Se registra una vez por cada error distinto para no llenar el log (4 por segundo).
+                    // A one-off capture failure must not stop the observation.
+                    // Each distinct error is logged once so the log is not flooded (4 per second).
                     if (ex.Message != _lastError)
                     {
                         _lastError = ex.Message;

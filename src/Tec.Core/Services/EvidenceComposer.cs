@@ -19,7 +19,7 @@ public sealed class EvidenceComposer(
         return new Evidence(sequence, interaction, caption, highlight, color, image, snapshot.CapturedAt);
     }
 
-    /// <summary>Prioridad: región explícita, elemento de UI, toda la captura.</summary>
+    /// <summary>Priority: explicit region, UI element, whole capture.</summary>
     internal static ScreenRect ResolveHighlight(Interaction interaction, CapturedFrame frame)
     {
         if (interaction.HighlightBounds is { IsEmpty: false } explicitBounds)

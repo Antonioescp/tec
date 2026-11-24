@@ -29,7 +29,7 @@ public sealed record SessionSettings
     public TimeSpan WindowSettleDelay { get; init; } = TimeSpan.FromMilliseconds(250);
 }
 
-/// <summary>Sesión en curso: el recolector y los recursos que le pertenecen.</summary>
+/// <summary>Running session: the collector and the resources it owns.</summary>
 public sealed class RunningSession(
     EvidenceSession session,
     EvidenceCollector collector,
@@ -50,9 +50,9 @@ public sealed class RunningSession(
 }
 
 /// <summary>
-/// Composition root: el único lugar que conoce las implementaciones concretas.
-/// Para soportar otra tecnología (WinForms, web, ...) basta con registrar aquí
-/// nuevas fuentes, enriquecedores o destinos.
+/// Composition root: the only place that knows the concrete implementations.
+/// To support another technology (WinForms, web, ...) just register new
+/// sources, enrichers or sinks here.
 /// </summary>
 public static class EvidenceSessionFactory
 {

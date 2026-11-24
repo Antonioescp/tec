@@ -5,7 +5,7 @@
         Width="760" Height="600" MinWidth="560" MinHeight="420"
         WindowStartupLocation="CenterScreen">
     <DockPanel Margin="12">
-        <!-- Aplicación a probar -->
+        <!-- Application under test -->
         <GroupBox DockPanel.Dock="Top" Header="Aplicación a probar" Padding="6">
             <DockPanel IsEnabled="{Binding IsIdle}">
                 <Button DockPanel.Dock="Right" Content="Iniciar app…" Command="{Binding LaunchCommand}" />
@@ -14,7 +14,7 @@
             </DockPanel>
         </GroupBox>
 
-        <!-- Opciones -->
+        <!-- Options -->
         <GroupBox DockPanel.Dock="Top" Header="Opciones" Padding="6" Margin="0,8,0,0">
             <Grid IsEnabled="{Binding IsIdle}">
                 <Grid.ColumnDefinitions>
@@ -55,7 +55,7 @@
             </Grid>
         </GroupBox>
 
-        <!-- Acciones -->
+        <!-- Actions -->
         <DockPanel DockPanel.Dock="Top" Margin="0,10,0,6">
             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
                 <Button Content="Abrir reporte" Command="{Binding OpenReportCommand}" />
@@ -70,7 +70,7 @@
 
         <TextBlock DockPanel.Dock="Bottom" Text="{Binding Status}" TextWrapping="Wrap" Margin="0,6,0,0" Foreground="#444" />
 
-        <!-- Evidencias -->
+        <!-- Evidence -->
         <ListBox ItemsSource="{Binding Evidences}" SelectedItem="{Binding SelectedEvidence}"
                  MouseDoubleClick="OnEvidenceDoubleClick" HorizontalContentAlignment="Stretch">
             <ListBox.ItemTemplate>

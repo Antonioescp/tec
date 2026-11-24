@@ -8,10 +8,10 @@ using Tec.Core.Model;
 namespace Tec.Core.Reporting;
 
 /// <summary>
-/// Reporte HTML (<c>reporte.html</c>) con las evidencias en orden. Se reescribe con cada
-/// evidencia para que el reporte exista aunque la sesión no se cierre correctamente.
+/// HTML report (<c>reporte.html</c>) with the evidence in order. It is rewritten with each
+/// piece of evidence so the report exists even if the session does not close cleanly.
 /// </summary>
-[SuppressMessage("Reliability", "CA1001", Justification = "El SemaphoreSlim no usa AvailableWaitHandle, así que no retiene recursos nativos.")]
+[SuppressMessage("Reliability", "CA1001", Justification = "SemaphoreSlim does not use AvailableWaitHandle, so it holds no native resources.")]
 public sealed class HtmlReportSink(IEvidenceFileNamer namer, IClock clock) : IEvidenceSink
 {
     public const string FileName = "reporte.html";

@@ -1,8 +1,8 @@
 namespace Tec.Core.Model;
 
 /// <summary>
-/// Imagen en memoria independiente de la plataforma: 32 bits por píxel, orden BGRA,
-/// de arriba hacia abajo, sin relleno entre filas. El canal alfa se ignora.
+/// Platform-independent in-memory image: 32 bits per pixel, BGRA order,
+/// top-down, no padding between rows. The alpha channel is ignored.
 /// </summary>
 public sealed class RasterImage
 {
@@ -46,9 +46,9 @@ public sealed class RasterImage
     }
 }
 
-/// <summary>Captura de una región de la pantalla.</summary>
-/// <param name="Bounds">Región de pantalla capturada (coordenadas físicas).</param>
-/// <param name="Image">Píxeles capturados; mismas dimensiones que <paramref name="Bounds"/>.</param>
+/// <summary>Capture of a screen region.</summary>
+/// <param name="Bounds">Captured screen region (physical coordinates).</param>
+/// <param name="Image">Captured pixels; same size as <paramref name="Bounds"/>.</param>
 public sealed record CapturedFrame(ScreenRect Bounds, RasterImage Image)
 {
     public bool TryGetPixel(int screenX, int screenY, out RgbColor color)

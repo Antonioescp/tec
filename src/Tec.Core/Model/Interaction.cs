@@ -1,8 +1,8 @@
 namespace Tec.Core.Model;
 
 /// <summary>
-/// Tipo de interacción. Es un tipo abierto: se pueden definir nuevos tipos
-/// sin modificar el núcleo (principio abierto/cerrado).
+/// Interaction kind. It is an open type: new kinds can be defined
+/// without modifying the core (open/closed principle).
 /// </summary>
 public sealed record InteractionKind(string Code, string DisplayName, InteractionCategory Category)
 {
@@ -25,7 +25,7 @@ public enum InteractionCategory
     Application,
 }
 
-/// <summary>Información del elemento de UI involucrado en la interacción.</summary>
+/// <summary>Information about the UI element involved in the interaction.</summary>
 public sealed record UiElementInfo(
     string? Name,
     string? ControlType,
@@ -34,7 +34,7 @@ public sealed record UiElementInfo(
     string? Value = null,
     bool IsPassword = false)
 {
-    /// <summary>Descripción legible, p. ej. <c>botón "Procesar"</c>.</summary>
+    /// <summary>Readable description, e.g. <c>botón "Procesar"</c>.</summary>
     public string Describe()
     {
         var type = string.IsNullOrWhiteSpace(ControlType) ? "elemento" : ControlType;
@@ -43,32 +43,32 @@ public sealed record UiElementInfo(
     }
 }
 
-/// <summary>Interacción detectada por una fuente y enriquecida durante la captura.</summary>
+/// <summary>Interaction detected by a source and enriched during capture.</summary>
 public sealed record Interaction
 {
     public required InteractionKind Kind { get; init; }
 
-    /// <summary>Momento en que ocurrió la interacción.</summary>
+    /// <summary>When the interaction happened.</summary>
     public required DateTimeOffset Timestamp { get; init; }
 
-    /// <summary>Texto propio de la fuente, p. ej. "Ctrl+S".</summary>
+    /// <summary>Source-specific text, e.g. "Ctrl+S".</summary>
     public string? Description { get; init; }
 
     public ScreenPoint? Point { get; init; }
 
-    /// <summary>Región a resaltar. Si es nula se usa la del elemento o la de toda la captura.</summary>
+    /// <summary>Region to highlight. If null, the element bounds or the whole capture are used.</summary>
     public ScreenRect? HighlightBounds { get; init; }
 
     public int? ProcessId { get; init; }
 
-    /// <summary>Handle de la ventana de nivel superior involucrada (0 si se desconoce).</summary>
+    /// <summary>Handle of the top-level window involved (0 if unknown).</summary>
     public nint WindowHandle { get; init; }
 
     public string? WindowTitle { get; init; }
 
     public UiElementInfo? Element { get; init; }
 
-    /// <summary>Espera antes de capturar (p. ej. para que una ventana termine de dibujarse).</summary>
+    /// <summary>Delay before capturing (e.g. so a window finishes painting).</summary>
     public TimeSpan CaptureDelay { get; init; } = TimeSpan.Zero;
 
     public IReadOnlyList<string> Notes { get; init; } = [];

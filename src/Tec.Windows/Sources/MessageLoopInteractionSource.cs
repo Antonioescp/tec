@@ -5,7 +5,7 @@ using Tec.Windows.Native;
 
 namespace Tec.Windows.Sources;
 
-/// <summary>Base para fuentes basadas en hooks que necesitan un hilo con bucle de mensajes.</summary>
+/// <summary>Base for hook-based sources that need a thread with a message loop.</summary>
 public abstract class MessageLoopInteractionSource : IInteractionSource
 {
     private readonly MessageLoopThread _loop;
@@ -36,10 +36,10 @@ public abstract class MessageLoopInteractionSource : IInteractionSource
         GC.SuppressFinalize(this);
     }
 
-    /// <summary>Instala el hook (se ejecuta en el hilo del bucle de mensajes).</summary>
+    /// <summary>Installs the hook (runs on the message loop thread).</summary>
     protected abstract void Install();
 
-    /// <summary>Desinstala el hook (se ejecuta en el hilo del bucle de mensajes).</summary>
+    /// <summary>Uninstalls the hook (runs on the message loop thread).</summary>
     protected abstract void Uninstall();
 
     protected virtual void OnStopped()
@@ -54,7 +54,7 @@ public abstract class MessageLoopInteractionSource : IInteractionSource
         }
         catch (Exception ex)
         {
-            // Una excepción nunca debe escapar de un callback de hook.
+            // An exception must never escape a hook callback.
             Log.Error(Name, $"Error al procesar la interacción {interaction.Kind}.", ex);
         }
     }

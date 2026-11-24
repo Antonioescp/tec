@@ -5,8 +5,8 @@ using Tec.Windows.Native;
 namespace Tec.Windows.Capture;
 
 /// <summary>
-/// Captura la ventana de la interacción junto con su ventana dueña (p. ej. el diálogo
-/// "espere" y la ventana principal detrás), con un pequeño margen.
+/// Captures the interaction's window together with its owner window (e.g. the "please
+/// wait" dialog and the main window behind it), with a small margin.
 /// </summary>
 public sealed class WindowCaptureRegionProvider(int margin = 8) : ICaptureRegionProvider
 {
@@ -35,14 +35,14 @@ public sealed class WindowCaptureRegionProvider(int margin = 8) : ICaptureRegion
     }
 }
 
-/// <summary>Captura el monitor completo donde ocurrió la interacción.</summary>
+/// <summary>Captures the whole monitor where the interaction happened.</summary>
 public sealed class MonitorCaptureRegionProvider : ICaptureRegionProvider
 {
     public ScreenRect GetRegion(Interaction interaction) =>
         Win32Window.GetMonitorBounds(WindowCaptureRegionProvider.ResolveWindow(interaction), interaction.Point);
 }
 
-/// <summary>Captura todo el escritorio virtual (todos los monitores).</summary>
+/// <summary>Captures the whole virtual desktop (all monitors).</summary>
 public sealed class VirtualScreenRegionProvider : ICaptureRegionProvider
 {
     public ScreenRect GetRegion(Interaction interaction) => Win32Window.GetVirtualScreen();

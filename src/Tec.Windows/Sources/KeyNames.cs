@@ -1,6 +1,6 @@
 namespace Tec.Windows.Sources;
 
-/// <summary>Clasificación y nombres legibles de teclas virtuales.</summary>
+/// <summary>Classification and readable names of virtual keys.</summary>
 internal static class KeyNames
 {
     public const int VK_BACK = 0x08, VK_TAB = 0x09, VK_RETURN = 0x0D, VK_SHIFT = 0x10, VK_CONTROL = 0x11, VK_MENU = 0x12;
@@ -22,14 +22,14 @@ internal static class KeyNames
 
     public static bool IsFunctionKey(int vk) => vk is >= VK_F1 and <= VK_F24;
 
-    /// <summary>Teclas que producen texto (o lo borran) dentro de un campo.</summary>
+    /// <summary>Keys that produce (or delete) text inside a field.</summary>
     public static bool IsTextKey(int vk) =>
-        vk is (>= 0x30 and <= 0x39) or (>= 0x41 and <= 0x5A) // dígitos y letras
+        vk is (>= 0x30 and <= 0x39) or (>= 0x41 and <= 0x5A) // digits and letters
             or (>= VK_NUMPAD0 and <= VK_DIVIDE)
             or (>= VK_OEM_1 and <= VK_OEM_8) or VK_OEM_102
             or VK_SPACE or VK_BACK;
 
-    /// <summary>Teclas de navegación o de estado que no generan evidencia por sí solas.</summary>
+    /// <summary>Navigation or state keys that do not produce evidence on their own.</summary>
     public static bool IsNavigationKey(int vk) =>
         vk is VK_TAB or (>= VK_PRIOR and <= VK_DOWN) or VK_INSERT or VK_CAPITAL or VK_NUMLOCK or VK_SCROLL;
 

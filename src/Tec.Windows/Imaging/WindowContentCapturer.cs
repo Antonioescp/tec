@@ -8,13 +8,13 @@ namespace Tec.Windows.Imaging;
 public interface IWindowContentCapturer
 {
     /// <summary>
-    /// Captura el contenido propio de la ventana, sin lo que tenga encima (tooltips,
-    /// diálogos, otras aplicaciones) ni el cursor.
+    /// Captures the window's own content, without whatever is on top of it (tooltips,
+    /// dialogs, other applications) or the cursor.
     /// </summary>
     bool TryCapture(nint hwnd, out RasterImage? image, out ScreenRect windowBounds);
 }
 
-/// <summary>Captura con <c>PrintWindow(PW_RENDERFULLCONTENT)</c>, compatible con WPF/DirectX.</summary>
+/// <summary>Capture with <c>PrintWindow(PW_RENDERFULLCONTENT)</c>, works with WPF/DirectX.</summary>
 public sealed class PrintWindowContentCapturer : IWindowContentCapturer
 {
     public bool TryCapture(nint hwnd, out RasterImage? image, out ScreenRect windowBounds)

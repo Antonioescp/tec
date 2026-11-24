@@ -3,7 +3,7 @@ using static Tec.Windows.Native.NativeMethods;
 
 namespace Tec.Windows.Native;
 
-/// <summary>Consultas de ventanas y pantalla (Win32) en un solo lugar.</summary>
+/// <summary>Window and screen queries (Win32) in one place.</summary>
 internal static class Win32Window
 {
     public static nint FromPoint(ScreenPoint point) =>
@@ -50,14 +50,14 @@ internal static class Win32Window
 
     public static nint GetForeground() => GetRoot(GetForegroundWindow());
 
-    /// <summary>Rectángulo completo de la ventana (el que usa PrintWindow), incluidos bordes invisibles.</summary>
+    /// <summary>Full window rectangle (the one PrintWindow uses), including invisible borders.</summary>
     public static ScreenRect GetFullRect(nint hwnd) =>
         GetWindowRect(hwnd, out var r) ? ToScreenRect(r) : ScreenRect.Empty;
 
     public static bool IsToolWindow(nint hwnd) =>
         (GetWindowLongPtr(hwnd, GWL_EXSTYLE).ToInt64() & WS_EX_TOOLWINDOW) != 0;
 
-    /// <summary>Límites visibles de la ventana (sin la sombra de DWM).</summary>
+    /// <summary>Visible window bounds (without the DWM shadow).</summary>
     public static ScreenRect GetBounds(nint hwnd)
     {
         if (!Exists(hwnd)) return ScreenRect.Empty;

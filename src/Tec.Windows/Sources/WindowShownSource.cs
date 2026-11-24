@@ -8,10 +8,10 @@ namespace Tec.Windows.Sources;
 
 public sealed record WindowCaptureOptions
 {
-    /// <summary>Espera antes de capturar una ventana recién mostrada, para que termine de dibujarse.</summary>
+    /// <summary>Delay before capturing a newly shown window, so it finishes painting.</summary>
     public TimeSpan SettleDelay { get; init; } = TimeSpan.FromMilliseconds(250);
 
-    /// <summary>Clases de ventana que nunca generan evidencia (tooltips, menús, ...).</summary>
+    /// <summary>Window classes that never produce evidence (tooltips, menus, ...).</summary>
     public IReadOnlySet<string> IgnoredClassNames { get; init; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
     {
         "tooltips_class32", "#32768", "IME", "MSCTFIME UI", "SysShadow",
@@ -19,8 +19,8 @@ public sealed record WindowCaptureOptions
 }
 
 /// <summary>
-/// Detecta ventanas de nivel superior que se muestran (ventanas de "espere",
-/// diálogos, ventanas de resultado, MessageBox) mediante un WinEvent hook.
+/// Detects top-level windows being shown ("please wait" windows,
+/// dialogs, result windows, MessageBox) through a WinEvent hook.
 /// </summary>
 public sealed class WindowShownSource(IClock clock, WindowCaptureOptions? options = null)
     : MessageLoopInteractionSource("ventanas", clock)
@@ -64,14 +64,14 @@ public sealed class WindowShownSource(IClock clock, WindowCaptureOptions? option
         }
         catch (Exception ex)
         {
-            // Nunca propagar excepciones a un callback nativo.
+            // Never propagate exceptions to a native callback.
             Log.Error(Name, $"Error al procesar la ventana 0x{hwnd:X}.", ex);
         }
     }
 
     private bool IsCandidate(nint hwnd)
     {
-        if (Win32Window.GetRoot(hwnd) != hwnd) return false;         // solo nivel superior
+        if (Win32Window.GetRoot(hwnd) != hwnd) return false;         // top-level only
         if (!Win32Window.IsVisible(hwnd)) return false;
         if (Win32Window.IsToolWindow(hwnd) && string.IsNullOrEmpty(Win32Window.GetTitle(hwnd))) return false; // popups/tooltips
         if (string.IsNullOrWhiteSpace(Win32Window.GetTitle(hwnd))) return false;

@@ -9,8 +9,8 @@ using static Tec.Windows.Native.NativeMethods;
 namespace Tec.Windows.Sources;
 
 /// <summary>
-/// Detecta clicks con un hook de mouse de bajo nivel. Se reacciona al botón presionado
-/// (no al soltarlo) para capturar la pantalla antes de que la aplicación responda.
+/// Detects clicks with a low-level mouse hook. It reacts to the button press
+/// (not the release) to capture the screen before the application responds.
 /// </summary>
 public sealed class MouseClickSource(IClock clock) : MessageLoopInteractionSource("mouse", clock)
 {
@@ -42,7 +42,7 @@ public sealed class MouseClickSource(IClock clock) : MessageLoopInteractionSourc
             }
             catch (Exception ex)
             {
-                // Nunca interrumpir la cadena de hooks.
+                // Never break the hook chain.
                 Log.Error(Name, "Error al procesar el evento de mouse.", ex);
             }
         }
@@ -81,7 +81,7 @@ public sealed class MouseClickSource(IClock clock) : MessageLoopInteractionSourc
             && Math.Abs(data.pt.X - _lastLeftClickPoint.X) <= GetSystemMetrics(SM_CXDOUBLECLK) / 2
             && Math.Abs(data.pt.Y - _lastLeftClickPoint.Y) <= GetSystemMetrics(SM_CYDOUBLECLK) / 2;
 
-        // Tras un doble click se reinicia para que un tercer click no cuente como doble.
+        // Reset after a double click so a third click does not count as another double.
         _lastLeftClickTime = isDouble ? 0 : data.time;
         _lastLeftClickPoint = data.pt;
         return isDouble;

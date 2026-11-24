@@ -169,7 +169,7 @@ public sealed class MainViewModel : ObservableObject
             }
             catch
             {
-                // Libera los hooks que sí se instalaron antes del fallo.
+                // Release the hooks that were installed before the failure.
                 await DisposeQuietlyAsync(session);
                 throw;
             }
@@ -210,7 +210,7 @@ public sealed class MainViewModel : ObservableObject
         _dialogs.RestoreMainWindow();
     }
 
-    /// <summary>Se llama al cerrar la ventana para no perder el reporte final.</summary>
+    /// <summary>Called when the window closes so the final report is not lost.</summary>
     public Task ShutdownAsync() => IsRunning ? StopAsync() : Task.CompletedTask;
 
     private void OnEvidenceCollected(RunningSession session, Evidence evidence)
@@ -218,7 +218,7 @@ public sealed class MainViewModel : ObservableObject
         var item = new EvidenceItem(evidence.Sequence, evidence.Caption.Title, evidence.Caption.Details, session.GetImagePath(evidence));
         OnUi(() =>
         {
-            // Mantener el orden por secuencia aunque las capturas terminen desordenadas.
+            // Keep sequence order even if captures finish out of order.
             var index = 0;
             while (index < Evidences.Count && Evidences[index].Sequence < item.Sequence) index++;
             Evidences.Insert(index, item);
@@ -242,7 +242,7 @@ public sealed class MainViewModel : ObservableObject
         catch (Exception ex) { ShowError($"No se pudo abrir {path}.", ex); }
     }
 
-    /// <summary>Registra el error completo (con stack trace) y muestra al usuario un resumen.</summary>
+    /// <summary>Logs the full error (with stack trace) and shows the user a summary.</summary>
     private void ShowError(string message, Exception ex)
     {
         Log.Error(LogCategory, message, ex);

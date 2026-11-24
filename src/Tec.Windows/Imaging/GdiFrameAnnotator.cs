@@ -25,8 +25,8 @@ public sealed record AnnotationStyle
 }
 
 /// <summary>
-/// Agrega una cabecera con la descripción de la interacción (sin tapar la captura),
-/// dibuja el recuadro de resaltado y, en los clicks, un marcador en el punto exacto.
+/// Adds a header with the interaction description (without covering the capture),
+/// draws the highlight box and, for clicks, a marker at the exact point.
 /// </summary>
 public sealed class GdiFrameAnnotator(AnnotationStyle? style = null) : IFrameAnnotator
 {
@@ -98,7 +98,7 @@ public sealed class GdiFrameAnnotator(AnnotationStyle? style = null) : IFrameAnn
             highlight.Width, highlight.Height);
         rect.Inflate(_style.HighlightPadding, _style.HighlightPadding);
 
-        // Mantener el recuadro completamente visible dentro de la captura.
+        // Keep the box fully visible inside the capture.
         var half = (int)Math.Ceiling(_style.HighlightPenWidth / 2);
         var visible = Rectangle.Inflate(imageArea, -half, -half);
         rect.Intersect(visible);
