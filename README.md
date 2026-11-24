@@ -1,7 +1,7 @@
 # TEC — Test Evidence Collector
 
-TEC recolecta evidencia durante una prueba manual. Se elige la aplicación a probar,
-se presiona **Iniciar** y TEC toma una captura por cada interacción:
+TEC recolecta evidencia durante una prueba manual. Se marcan **una o varias** aplicaciones a probar
+(o que se usan durante la prueba), se presiona **Iniciar** y TEC toma una captura por cada interacción:
 
 | Interacción | Cómo se detecta | Qué se resalta |
 |---|---|---|
@@ -12,19 +12,44 @@ se presiona **Iniciar** y TEC toma una captura por cada interacción:
 | Cambio en pantalla (overlay de "cargando", panel o resultados que aparecen en la misma ventana) | Comparación periódica (4 por segundo) del contenido de la ventana activa de la app | La zona que cambió |
 
 Cada imagen lleva una cabecera con el número, el tipo de interacción, el elemento, la
-hora, la ventana y la posición, y un **recuadro rojo**; si el fondo alrededor del recuadro
+hora, la aplicación, la ventana y la posición, y un **recuadro rojo**; si el fondo alrededor del recuadro
 es rojo (o parecido) se usa otro color que contraste (azul, magenta, verde…).
 TEC está disponible en español y en inglés (opción **Idioma**): el idioma elegido se usa en la
 interfaz, en las cabeceras de las capturas y en el reporte, y se recuerda entre ejecuciones
 (`%LOCALAPPDATA%\TEC\settings.json`). La primera vez se usa el idioma de Windows.
 
-Por cada sesión se crea una carpeta `Documentos\TEC\Evidencias\<fecha>_<app>\` con:
+Por cada sesión se crea una carpeta `Documentos\TEC\Evidencias\<fecha>_<apps>\` con:
 
 - `001_click.png`, `002_ventana.png`, … — capturas anotadas.
 - `reporte.html` — reporte con todas las evidencias en orden.
 - `evidencias.jsonl` — metadatos de cada evidencia.
 
-Solo se capturan las interacciones con el proceso elegido; las interacciones con TEC se ignoran.
+`<apps>` es el nombre de la aplicación marcada; con varias se combinan (`20261124_165626_Notepad+Tec.SampleApp`).
+
+Solo se capturan las interacciones con las aplicaciones marcadas; las interacciones con TEC y con
+cualquier otra aplicación se ignoran.
+
+## Varias aplicaciones en una misma prueba
+
+Una prueba no siempre ocurre dentro de la aplicación: a veces hay que preparar un recurso en otra
+herramienta (Postman, un navegador, una base de datos) y luego comprobar el resultado en la primera.
+TEC permite marcar varias aplicaciones antes de **Iniciar** y trata toda la prueba como **una sola
+sesión**: una numeración, una carpeta y un reporte, con las evidencias en orden cronológico. Cada
+leyenda y cada línea de `evidencias.jsonl` indican la aplicación a la que pertenece la evidencia.
+
+```
+#001 click   aplicación: Farmax   ventana: Ventas        buscar el recurso (no está)
+#002 click   aplicación: Postman  ventana: Mi colección  crear el recurso
+#003 cambio  aplicación: Farmax   ventana: Ventas        el recurso ya aparece
+```
+
+No hay un "modo foco": la interacción pertenece a la ventana que la recibe, así que la aplicación
+marcada es la única regla. Los cambios en pantalla se siguen observando en la ventana en primer
+plano de las aplicaciones marcadas, por lo que lo que cambie en una aplicación mientras se está en
+otra se detecta al volver a ella.
+
+Si una de las aplicaciones marcadas se cierra a mitad de prueba, TEC lo avisa en la barra de estado,
+lo registra en el log y lo anota en el reporte; la sesión continúa con las demás.
 
 ## Uso
 
@@ -134,5 +159,5 @@ con la captura anterior:
   protegido (DRM).
 - Si el hilo de UI de la app está bloqueado, UI Automation no responde; la evidencia
   se guarda igual, con una nota y resaltando la ventana completa.
-- Los cambios en pantalla solo se observan en la ventana activa de la app. El
+- Los cambios en pantalla solo se observan en la ventana activa de las aplicaciones marcadas. El
   desplazamiento de listas grandes también cuenta como cambio.
