@@ -30,4 +30,7 @@
   <data name="Session" xml:space="preserve">
     <value>Session</value>
   </data>
+  <data name="ApplicationsLost" xml:space="preserve">
+    <value>Applications that stopped running during the session</value>
+  </data>
 </root>

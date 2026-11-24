@@ -35,6 +35,8 @@ public sealed class CaptionFormatter(TecLanguage language) : IInteractionCaption
         {
             interaction.Timestamp.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture),
         };
+        if (!string.IsNullOrWhiteSpace(interaction.ProcessName))
+            details.Add(_texts.Format("App", interaction.ProcessName));
         if (!string.IsNullOrWhiteSpace(interaction.WindowTitle))
             details.Add(_texts.Format("Window", interaction.WindowTitle));
         if (interaction.Point is { } p)

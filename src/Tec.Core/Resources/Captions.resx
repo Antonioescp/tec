@@ -216,6 +216,9 @@
   <data name="UnknownElement" xml:space="preserve">
     <value>elemento</value>
   </data>
+  <data name="App" xml:space="preserve">
+    <value>Aplicación: {0}</value>
+  </data>
   <data name="Window" xml:space="preserve">
     <value>Ventana: "{0}"</value>
   </data>

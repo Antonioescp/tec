@@ -66,6 +66,7 @@ public sealed class JsonLinesEvidenceLogSink(IEvidenceFileNamer namer) : IEviden
             i.Timestamp,
             evidence.CapturedAt,
             i.ProcessId,
+            i.ProcessName,
             i.WindowTitle,
             Point = i.Point is { } p ? new { p.X, p.Y } : null,
             Highlight = new { evidence.HighlightBounds.Left, evidence.HighlightBounds.Top, evidence.HighlightBounds.Width, evidence.HighlightBounds.Height },

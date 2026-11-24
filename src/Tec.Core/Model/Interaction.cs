@@ -79,6 +79,9 @@ public sealed record Interaction
 
     public int? ProcessId { get; init; }
 
+    /// <summary>Name of the application owning the window; filled during enrichment, null when unknown.</summary>
+    public string? ProcessName { get; init; }
+
     /// <summary>Handle of the top-level window involved (0 if unknown).</summary>
     public nint WindowHandle { get; init; }
 

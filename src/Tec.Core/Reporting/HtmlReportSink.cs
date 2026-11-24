@@ -13,7 +13,11 @@ namespace Tec.Core.Reporting;
 /// piece of evidence so the report exists even if the session does not close cleanly.
 /// </summary>
 [SuppressMessage("Reliability", "CA1001", Justification = "SemaphoreSlim does not use AvailableWaitHandle, so it holds no native resources.")]
-public sealed class HtmlReportSink(IEvidenceFileNamer namer, IClock clock, TecLanguage language) : IEvidenceSink
+public sealed class HtmlReportSink(
+    IEvidenceFileNamer namer,
+    IClock clock,
+    TecLanguage language,
+    Func<IReadOnlyList<string>>? lostApplications = null) : IEvidenceSink
 {
     public const string FileName = "reporte.html";
 
@@ -51,7 +55,8 @@ public sealed class HtmlReportSink(IEvidenceFileNamer namer, IClock clock, TecLa
         await _gate.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
         {
-            var html = Render(session, finishedAt, [.. _entries.OrderBy(e => e.Sequence)], language, _texts);
+            var lost = lostApplications?.Invoke() ?? [];
+            var html = Render(session, finishedAt, [.. _entries.OrderBy(e => e.Sequence)], language, _texts, lost);
             await File.WriteAllTextAsync(Path.Combine(session.OutputDirectory, FileName), html, Encoding.UTF8, cancellationToken).ConfigureAwait(false);
         }
         finally
@@ -60,7 +65,13 @@ public sealed class HtmlReportSink(IEvidenceFileNamer namer, IClock clock, TecLa
         }
     }
 
-    private static string Render(EvidenceSession session, DateTimeOffset? finishedAt, IReadOnlyList<Entry> entries, TecLanguage language, Texts texts)
+    private static string Render(
+        EvidenceSession session,
+        DateTimeOffset? finishedAt,
+        IReadOnlyList<Entry> entries,
+        TecLanguage language,
+        Texts texts,
+        IReadOnlyList<string> lostApplications)
     {
         static string E(string? text) => WebUtility.HtmlEncode(text ?? string.Empty);
         static string D(DateTimeOffset d) => d.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
@@ -78,6 +89,7 @@ public sealed class HtmlReportSink(IEvidenceFileNamer namer, IClock clock, TecLa
               header { background: #1e1e1e; color: #fff; padding: 16px 24px; }
               header h1 { margin: 0 0 6px; font-size: 20px; }
               header p { margin: 2px 0; color: #c8c8c8; font-size: 13px; }
+              header p.lost { color: #ffb4b4; }
               main { padding: 16px 24px; max-width: 1400px; }
               nav ol { columns: 2; font-size: 13px; }
               article { background: #fff; border-radius: 6px; padding: 12px 16px; margin: 16px 0; box-shadow: 0 1px 3px rgba(0,0,0,.12); }
@@ -92,7 +104,11 @@ public sealed class HtmlReportSink(IEvidenceFileNamer namer, IClock clock, TecLa
         sb.Append("<p>").Append(E(texts.Get("Started"))).Append(": ").Append(D(session.StartedAt));
         sb.Append(" · ").Append(E(finishedAt is { } f ? $"{texts.Get("Finished")}: {D(f)}" : texts.Get("InProgress")));
         sb.Append(" · ").Append(E(texts.Get("EvidenceCount"))).Append(": ").Append(entries.Count).Append("</p>");
-        sb.Append("<p>").Append(E(texts.Get("Session"))).Append(": ").Append(E(session.Id)).Append("</p></header><main>");
+        sb.Append("<p>").Append(E(texts.Get("Session"))).Append(": ").Append(E(session.Id)).Append("</p>");
+        if (lostApplications.Count > 0)
+            sb.Append("<p class=\"lost\">").Append(E(texts.Get("ApplicationsLost"))).Append(": ")
+              .Append(E(string.Join(", ", lostApplications))).Append("</p>");
+        sb.Append("</header><main>");
 
         if (entries.Count > 0)
         {
