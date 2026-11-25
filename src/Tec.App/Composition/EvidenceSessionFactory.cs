@@ -22,6 +22,10 @@ public sealed record SessionSettings
 {
     public required IReadOnlyList<TargetProcessInfo> Targets { get; init; }
     public required string OutputRoot { get; init; }
+
+    /// <summary>Name the tester gave the session; empty means the one built from the applications.</summary>
+    public string? SessionName { get; init; }
+
     public CaptureArea Area { get; init; } = CaptureArea.Window;
     public TecLanguage Language { get; init; } = TecLanguage.Spanish;
     public bool CaptureClicks { get; init; } = true;
@@ -102,7 +106,11 @@ public static class EvidenceSessionFactory
         ];
 
         var collector = new EvidenceCollector(sources, filter, snapshotter, composer, sinks);
-        var session = EvidenceSession.Create(settings.OutputRoot, [.. settings.Targets.Select(t => t.ProcessName)], clock.Now);
+        var session = EvidenceSession.Create(settings.OutputRoot, [.. settings.Targets.Select(t => t.ProcessName)], settings.SessionName, clock.Now);
+
+        // The folder is taken here, so a second session asking for the same name takes the next one.
+        System.IO.Directory.CreateDirectory(session.OutputDirectory);
+
         var running = new RunningSession(session, collector, namer, owned, targets);
 
         // Watching starts once everything is in place, so a lost application is never missed silently.

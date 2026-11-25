@@ -75,6 +75,12 @@
   <data name="Browse" xml:space="preserve">
     <value>Examinar…</value>
   </data>
+  <data name="SessionNameGroup" xml:space="preserve">
+    <value>Nombre de la sesión (opcional):</value>
+  </data>
+  <data name="SessionNamePreviewTip" xml:space="preserve">
+    <value>Opcional. Lo que se ve en gris es la carpeta que se creará si lo dejas vacío.</value>
+  </data>
   <data name="MinimizeOnStart" xml:space="preserve">
     <value>Minimizar TEC al iniciar la grabación</value>
   </data>

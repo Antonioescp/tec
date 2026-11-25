@@ -54,6 +54,7 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
                 <TextBlock Grid.Row="0" Text="{Binding [LanguageLabel], Source={x:Static loc:Localizer.Instance}}" VerticalAlignment="Center" Margin="0,0,8,6" />
@@ -83,7 +84,28 @@
                     <TextBox Text="{Binding OutputRoot}" VerticalContentAlignment="Center" />
                 </DockPanel>
 
-                <CheckBox Grid.Row="4" Grid.Column="1" Margin="0,6,0,0" Content="{Binding [MinimizeOnStart], Source={x:Static loc:Localizer.Instance}}" IsChecked="{Binding MinimizeOnStart}" />
+                <TextBlock Grid.Row="4" Text="{Binding [SessionNameGroup], Source={x:Static loc:Localizer.Instance}}" VerticalAlignment="Center" Margin="0,6,8,0" />
+                <Grid Grid.Row="4" Grid.Column="1" Margin="0,6,0,0">
+                    <TextBox MaxLength="40" VerticalContentAlignment="Center"
+                             Text="{Binding SessionName, UpdateSourceTrigger=PropertyChanged}"
+                             ToolTip="{Binding [SessionNamePreviewTip], Source={x:Static loc:Localizer.Instance}}" />
+                    <!-- WPF has no placeholder: the grey text sits over the field and only shows while it is empty. -->
+                    <TextBlock Text="{Binding SessionNamePreview}" Foreground="#FF9E9E9E" IsHitTestVisible="False"
+                               Margin="7,0,7,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding SessionName}" Value="">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </Grid>
+
+                <CheckBox Grid.Row="5" Grid.Column="1" Margin="0,6,0,0" Content="{Binding [MinimizeOnStart], Source={x:Static loc:Localizer.Instance}}" IsChecked="{Binding MinimizeOnStart}" />
             </Grid>
         </GroupBox>
 

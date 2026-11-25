@@ -54,6 +54,8 @@ public sealed class MainViewModel : ObservableObject
     private IReadOnlyList<CaptureAreaOption> _captureAreas = [];
     private CaptureAreaOption _selectedArea = null!;
     private string _outputRoot;
+    private string _sessionName = string.Empty;
+    private string _sessionNamePreview = string.Empty;
     private Func<string> _status;
     private bool _captureClicks = true;
     private bool _captureKeyboardCommands = true;
@@ -128,6 +130,12 @@ public sealed class MainViewModel : ObservableObject
         }
     }
     public string OutputRoot { get => _outputRoot; set => SetProperty(ref _outputRoot, value); }
+
+    /// <summary>Name the next session will use; empty means the one built from the applications.</summary>
+    public string SessionName { get => _sessionName; set => SetProperty(ref _sessionName, value); }
+
+    /// <summary>Folder a nameless session would get; shown grey inside the name field while it is empty.</summary>
+    public string SessionNamePreview { get => _sessionNamePreview; private set => SetProperty(ref _sessionNamePreview, value); }
     /// <summary>Status line; it is kept as a function so it is rewritten when the language changes.</summary>
     public string Status => _status();
     public bool CaptureClicks { get => _captureClicks; set => SetProperty(ref _captureClicks, value); }
@@ -165,8 +173,17 @@ public sealed class MainViewModel : ObservableObject
     {
         OnPropertyChanged(nameof(HasSelectedProcesses));
         OnPropertyChanged(nameof(SelectedProcesses));
+        RefreshSessionNamePreview();
         CommandManager.InvalidateRequerySuggested();
     }
+
+    /// <summary>
+    /// Folder the session would get if the name field is left empty. The clock shown here is the one
+    /// of this moment: the real folder takes the clock of the start.
+    /// </summary>
+    private void RefreshSessionNamePreview() =>
+        SessionNamePreview = EvidenceSession.PreviewSessionName(
+            [.. SelectedProcesses.Select(p => p.ProcessName)], DateTimeOffset.Now);
 
     private void Launch()
     {
@@ -213,6 +230,7 @@ public sealed class MainViewModel : ObservableObject
             {
                 Targets = targets,
                 OutputRoot = OutputRoot,
+                SessionName = SessionName,
                 Area = SelectedArea.Value,
                 Language = Language,
                 CaptureClicks = CaptureClicks,
@@ -223,6 +241,7 @@ public sealed class MainViewModel : ObservableObject
                 WindowSettleDelay = TimeSpan.FromMilliseconds(WindowSettleDelayMs),
             };
             Log.Info(LogCategory, $"Iniciando sesión con {targets.Count} aplicación(es): {string.Join(", ", targets.Select(t => t.ToString()))}.");
+            if (!string.IsNullOrWhiteSpace(SessionName)) Log.Info(LogCategory, $"Nombre de la sesión: {SessionName}.");
 
             var session = await Task.Run(() => EvidenceSessionFactory.Create(settings));
             session.Collector.EvidenceCollected += (_, evidence) => OnEvidenceCollected(session, evidence);
@@ -276,6 +295,7 @@ public sealed class MainViewModel : ObservableObject
         }
         _session = null;
         NotifyRunningChanged();
+        RefreshSessionNamePreview();
         _dialogs.RestoreMainWindow();
     }
 
