@@ -18,16 +18,36 @@ TEC está disponible en español y en inglés (opción **Idioma**): el idioma el
 interfaz, en las cabeceras de las capturas y en el reporte, y se recuerda entre ejecuciones
 (`%LOCALAPPDATA%\TEC\settings.json`). La primera vez se usa el idioma de Windows.
 
-Por cada sesión se crea una carpeta `Documentos\TEC\Evidencias\<fecha>_<apps>\` con:
+Por cada sesión se crea una carpeta `Documentos\TEC\Evidencias\<fecha>_<nombre>\` con:
 
 - `001_click.png`, `002_ventana.png`, … — capturas anotadas.
 - `reporte.html` — reporte con todas las evidencias en orden.
 - `evidencias.jsonl` — metadatos de cada evidencia.
 
-`<apps>` es el nombre de la aplicación marcada; con varias se combinan (`20261124_165626_Notepad+Tec.SampleApp`).
+`<nombre>` lo pone el tester en el campo **Nombre de la sesión (opcional)**; si se deja vacío, TEC usa
+las aplicaciones marcadas (`20261124_165626_Notepad+Tec.SampleApp`).
 
 Solo se capturan las interacciones con las aplicaciones marcadas; las interacciones con TEC y con
 cualquier otra aplicación se ignoran.
+
+## Nombre de la sesión
+
+Antes de **Iniciar** se puede escribir un nombre —`Login con Postman`, `Alta de cliente v2`— para
+distinguir unas pruebas de otras sobre las mismas aplicaciones. Con nombre, la carpeta es
+`20261124_174708_Login_con_Postman`; sin él, se usan las aplicaciones, como siempre.
+
+Mientras el campo está vacío, dentro se ve en gris el nombre que se usaría
+(`20261124_174707_Notepad+Tec.SampleApp`), actualizado al marcar o desmarcar aplicaciones. La hora de
+esa pista es orientativa: la carpeta real se fija en el momento de **Iniciar**. En cuanto se escribe,
+la pista desaparece.
+
+El nombre se ajusta para que sea válido como nombre de carpeta: los caracteres no permitidos y los
+espacios pasan a `_`, y se limita a 40 caracteres (`Login con Postman` → `Login_con_Postman`). Si no
+queda nada aprovechable, TEC usa el nombre de las aplicaciones. El reporte titula con el nombre de la
+sesión y, debajo, lista las aplicaciones seguidas.
+
+Dos sesiones con el mismo nombre no chocan: la hora las separa. Si además la carpeta ya existe (dos
+TEC iniciando en el mismo segundo), la siguiente usa el sufijo `_2`, `_3`, …
 
 ## Varias aplicaciones en una misma prueba
 
