@@ -78,6 +78,47 @@ public class HtmlReportSinkTests
         }
     }
 
+    [Fact]
+    public async Task A_named_session_shows_its_name_and_still_lists_the_applications()
+    {
+        var directory = CreateSessionDirectory();
+        try
+        {
+            var session = new EvidenceSession("s1", "Farmax+Postman", Now, directory, "Login con Postman");
+            var sink = new HtmlReportSink(new SequentialEvidenceFileNamer(".png"), SystemClock.Instance, TecLanguage.Spanish);
+
+            await sink.OnSessionStartedAsync(session, CancellationToken.None);
+
+            var html = await File.ReadAllTextAsync(Path.Combine(directory, HtmlReportSink.FileName));
+            Assert.Contains("<h1>Evidencia de prueba — Login con Postman</h1>", html, StringComparison.Ordinal);
+            Assert.Contains("<p>Aplicaciones: Farmax+Postman</p>", html, StringComparison.Ordinal);
+        }
+        finally
+        {
+            DeleteDirectory(directory);
+        }
+    }
+
+    [Fact]
+    public async Task A_session_without_a_name_does_not_repeat_the_applications()
+    {
+        var directory = CreateSessionDirectory();
+        try
+        {
+            var session = new EvidenceSession("s1", "Farmax+Postman", Now, directory);
+            var sink = new HtmlReportSink(new SequentialEvidenceFileNamer(".png"), SystemClock.Instance, TecLanguage.Spanish);
+
+            await sink.OnSessionStartedAsync(session, CancellationToken.None);
+
+            var html = await File.ReadAllTextAsync(Path.Combine(directory, HtmlReportSink.FileName));
+            Assert.DoesNotContain("<p>Aplicaciones:", html, StringComparison.Ordinal);
+        }
+        finally
+        {
+            DeleteDirectory(directory);
+        }
+    }
+
     private static string CreateSessionDirectory()
     {
         var directory = Path.Combine(Path.GetTempPath(), "tec-tests", Guid.NewGuid().ToString("N"));
